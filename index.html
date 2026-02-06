@@ -2,65 +2,159 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobil Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Min Virtuelle Mobil</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: sans-serif; margin: 0; background: #000; height: 100vh; display: flex; flex-direction: column; }
+        :root { --ios-blue: #007AFF; --ios-gray: #1C1C1E; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* Adresselinje */
-        .nav-bar { background: #222; padding: 10px; display: flex; gap: 5px; }
-        input { flex-grow: 1; padding: 12px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
-        button { padding: 10px 15px; border-radius: 8px; border: none; background: #007bff; color: white; font-weight: bold; }
+        body { 
+            margin: 0; padding: 0; 
+            background: #000; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; 
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
 
-        /* Selve vinduet */
-        .browser-frame { flex-grow: 1; background: white; border: none; width: 100%; }
+        /* Selve telefon-rammen */
+        .phone {
+            width: 100%; height: 100%;
+            max-width: 400px; max-height: 850px;
+            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=500&q=80');
+            background-size: cover;
+            position: relative;
+            border-radius: 40px;
+            border: 8px solid #333;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* Statusbar på toppen */
+        .status-bar {
+            height: 44px; padding: 0 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: white; font-size: 14px; font-weight: 600;
+            z-index: 100;
+        }
+
+        /* Hjem-skjerm med apper */
+        .home-screen {
+            flex-grow: 1; display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 20px; padding: 30px 20px;
+            transition: transform 0.4s ease;
+        }
+
+        .app-icon {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            cursor: pointer;
+        }
+
+        .icon-box {
+            width: 60px; height: 60px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .app-label { color: white; font-size: 12px; }
+
+        /* Nettleser-Appen (Skjult som standard) */
+        #browser-app {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: white;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+            z-index: 200;
+        }
+
+        #browser-app.open { transform: translateY(0); }
+
+        .browser-header { background: #f1f1f1; padding: 40px 10px 10px; display: flex; gap: 10px; }
+        .url-input { flex-grow: 1; padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
         
-        /* Hjelpetekst */
-        .info { background: #111; color: #888; font-size: 10px; padding: 5px; text-align: center; }
+        iframe { flex-grow: 1; border: none; width: 100%; background: white; }
+
+        /* Hjem-knapp (Sveipestripe nederst) */
+        .home-indicator {
+            width: 120px; height: 5px; background: white;
+            border-radius: 10px; position: absolute; bottom: 8px; left: 50%;
+            transform: translateX(-50%); z-index: 300; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="info">Bruker Proxy for å omgå blokkeringer</div>
-    
-    <div class="nav-bar">
-        <input type="text" id="urlInput" placeholder="Søk eller skriv adresse (f.eks. vg.no)...">
-        <button onclick="loadPage()">Gå</button>
+    <div class="phone">
+        <div class="status-bar">
+            <div id="clock">12:00</div>
+            <div style="display:flex; gap: 5px;">📶 🔋</div>
+        </div>
+
+        <div class="home-screen" id="home">
+            <div class="app-icon" onclick="openApp()">
+                <div class="icon-box" style="background: linear-gradient(#54e38e, #41c172);">🌐</div>
+                <span class="app-label">Browser</span>
+            </div>
+            <div class="app-icon">
+                <div class="icon-box" style="background: #ff9500;">⚙️</div>
+                <span class="app-label">Innstillinger</span>
+            </div>
+            <div class="app-icon">
+                <div class="icon-box" style="background: #ff3b30;">📸</div>
+                <span class="app-label">Kamera</span>
+            </div>
+        </div>
+
+        <div id="browser-app">
+            <div class="browser-header">
+                <input type="text" id="urlInput" class="url-input" placeholder="Søk eller skriv URL...">
+                <button onclick="navigate()" style="border:none; background:none; color:var(--ios-blue); font-weight:bold;">Gå</button>
+            </div>
+            <iframe id="browserIframe" src="about:blank"></iframe>
+        </div>
+
+        <div class="home-indicator" onclick="goHome()"></div>
     </div>
 
-    <iframe id="viewer" class="browser-frame" src="about:blank"></iframe>
-
     <script>
-        function loadPage() {
-            let input = document.getElementById('urlInput').value;
-            let viewer = document.getElementById('viewer');
+        // Oppdater klokka
+        function updateClock() {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('clock').innerText = time;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-            if (!input) return;
-
-            // Hvis det ikke er en URL, gjør det til et Google-søk
-            if (!input.includes('.') || input.includes(' ')) {
-                viewer.src = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
-                return;
-            }
-
-            // Legg til https:// hvis det mangler
-            if (!input.startsWith('http')) {
-                input = 'https://' + input;
-            }
-
-            // Bruk en offentlig proxy for å hente siden
-            // Vi bruker 'https://codertabs.com/cors-proxy/' eller lignende triks
-            // MERK: Noen proxyer kan være trege eller ha begrensninger
-            viewer.src = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
-            
-            // For å faktisk se andre sider enn Google, må man ofte bruke en dedikert proxy-tjeneste-link:
-            // f.eks: viewer.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(input);
+        // App-styring
+        function openApp() {
+            document.getElementById('browser-app').classList.add('open');
         }
 
-        // Enter-tast på mobil-tastatur
+        function goHome() {
+            document.getElementById('browser-app').classList.remove('open');
+        }
+
+        // Nettleser-logikk
+        function navigate() {
+            let url = document.getElementById('urlInput').value;
+            const iframe = document.getElementById('browserIframe');
+            
+            if (!url.startsWith('http')) {
+                // Bruker Google med IGU-trikset for å tillate visning
+                iframe.src = "https://www.google.com/search?q=" + encodeURIComponent(url) + "&igu=1";
+            } else {
+                iframe.src = url;
+            }
+        }
+        
+        // Enter-tast
         document.getElementById('urlInput').addEventListener("keyup", function(e) {
-            if (e.key === "Enter") loadPage();
+            if (e.key === "Enter") navigate();
         });
     </script>
 </body>
