@@ -3,182 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Min AI Mobil</title>
+    <title>Min SuperMobil</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-bg: #f2f2f7; }
+        :root { --ios-blue: #007AFF; --ios-bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #111; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        body { margin: 0; background: #111; font-family: -apple-system, sans-serif; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
 
         .phone {
-            width: 100%; height: 100%; max-width: 414px; max-height: 896px;
-            background: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=500') center/cover;
-            position: relative; border-radius: 40px; border: 8px solid #333; overflow: hidden;
-            display: flex; flex-direction: column;
+            width: 100%; height: 100%; max-width: 414px;
+            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover;
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
         }
 
         /* Status Bar */
         .status-bar { height: 44px; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 600; z-index: 1000; }
 
         /* Home Screen */
-        .home-screen { flex-grow: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 100px; gap: 20px; padding: 40px 20px; }
-        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; animation: fadeIn 0.5s ease; }
-        .icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .home-screen { flex-grow: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 100px; gap: 20px; padding: 40px 20px; transition: 0.3s; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .app-label { color: white; font-size: 11px; font-weight: 500; }
 
-        /* App Window System */
+        /* App Windows */
         .app-window {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
+            background: white; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
             z-index: 500; display: flex; flex-direction: column;
         }
         .app-window.active { transform: translateY(0); }
-        .app-header { padding: 40px 15px 10px; background: #f9f9f9; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 18px; }
+
+        /* Browser App */
+        .browser-toolbar { padding: 10px; background: #eee; display: flex; gap: 5px; }
+        .browser-toolbar input { flex-grow: 1; border-radius: 10px; border: 1px solid #ccc; padding: 8px; }
 
         /* Messages App */
-        #message-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: white; }
-        .msg { padding: 8px 12px; border-radius: 18px; max-width: 75%; font-size: 14px; }
-        .msg.me { background: var(--ios-blue); color: white; align-self: flex-end; }
-        .msg.them { background: #e5e5ea; color: black; align-self: flex-start; }
-        .input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #ddd; }
-        input { flex-grow: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; }
+        #msg-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 10px 15px; border-radius: 20px; max-width: 80%; font-size: 14px; }
+        .bubble.me { background: var(--ios-blue); color: white; align-self: flex-end; }
+        .bubble.friend { background: #e5e5ea; color: black; align-self: flex-start; }
 
-        /* Camera View */
-        #camera-video { width: 100%; height: 100%; object-fit: cover; background: black; }
+        /* Camera & Gallery */
+        #camera-feed { width: 100%; height: 100%; object-fit: cover; background: #000; }
+        .shutter-btn { width: 70px; height: 70px; border: 5px solid white; border-radius: 50%; position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); }
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; overflow-y: auto; }
+        .gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
 
-        .home-indicator {
-            width: 130px; height: 5px; background: #fff; border-radius: 10px;
-            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 2000; cursor: pointer;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .home-btn { width: 130px; height: 5px; background: white; border-radius: 10px; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 2000; cursor: pointer; }
+        .home-btn.dark { background: #ccc; }
     </style>
 </head>
 <body>
 
 <div class="phone">
-    <div class="status-bar">
-        <div id="clock">12:00</div>
-        <div>📶 🔋</div>
-    </div>
+    <div class="status-bar"><div id="clock">12:00</div><div>📶 🔋</div></div>
 
     <div class="home-screen">
-        <div class="app-icon" onclick="openApp('messages-app')">
+        <div class="app-icon" onclick="openApp('msg-app')">
             <div class="icon-box" style="background: #34C759;">💬</div>
-            <span style="color:white; font-size:12px;">Meldinger</span>
+            <span class="app-label">Meldinger</span>
         </div>
         <div class="app-icon" onclick="openApp('browser-app')">
             <div class="icon-box" style="background: #5856D6;">🌐</div>
-            <span style="color:white; font-size:12px;">Nettleser</span>
+            <span class="app-label">Browser</span>
         </div>
-        <div class="app-icon" onclick="openApp('camera-app')">
+        <div class="app-icon" onclick="openApp('cam-app')">
             <div class="icon-box" style="background: #8E8E93;">📷</div>
-            <span style="color:white; font-size:12px;">Kamera</span>
+            <span class="app-label">Kamera</span>
         </div>
-    </div>
-
-    <div id="messages-app" class="app-window">
-        <div class="app-header"><b>Meldinger</b></div>
-        <div id="message-list"></div>
-        <div class="input-area">
-            <input type="text" id="msgInput" placeholder="Skriv en melding...">
-            <button onclick="sendMessage()" style="border:none; color:var(--ios-blue); background:none; font-weight:bold;">Send</button>
+        <div class="app-icon" onclick="openApp('gal-app')">
+            <div class="icon-box" style="background: linear-gradient(#ffdd00, #ff9500);">🖼️</div>
+            <span class="app-label">Galleri</span>
         </div>
     </div>
 
     <div id="browser-app" class="app-window">
-        <div class="app-header">
-            <input type="text" id="urlBar" placeholder="Søk på Google..." style="width:100%;">
+        <div class="app-header">Nettleser</div>
+        <div class="browser-toolbar">
+            <input type="text" id="url-bar" placeholder="Søk eller URL...">
+            <button onclick="browse()" style="border:none; color:var(--ios-blue); background:none;">Gå</button>
         </div>
-        <iframe id="browserFrame" style="flex-grow:1; border:none;" src="about:blank"></iframe>
+        <iframe id="frame" style="flex-grow:1; border:none;" src="about:blank"></iframe>
     </div>
 
-    <div id="camera-app" class="app-window">
-        <div class="app-header"><b>Kamera</b> <button onclick="closeCamera()" style="border:none; background:none; color:red;">Av</button></div>
-        <video id="camera-video" autoplay playsinline></video>
-        <div style="position:absolute; bottom:50px; width:100%; display:flex; justify-content:center;">
-            <div style="width:70px; height:70px; border:5px solid white; border-radius:50%;"></div>
+    <div id="msg-app" class="app-window">
+        <div class="app-header">Vennen min</div>
+        <div id="msg-content"></div>
+        <div style="padding:10px; border-top:1px solid #ddd; display:flex; gap:5px;">
+            <input type="text" id="msg-input" style="flex-grow:1; border-radius:20px; border:1px solid #ddd; padding:10px;">
+            <button onclick="sendMsg()" style="border:none; color:var(--ios-blue); background:none; font-weight:bold;">Send</button>
         </div>
     </div>
 
-    <div class="home-indicator" onclick="goHome()"></div>
+    <div id="cam-app" class="app-window" style="background:black;">
+        <video id="camera-feed" autoplay playsinline></video>
+        <div class="shutter-btn" onclick="takePhoto()"></div>
+    </div>
+
+    <div id="gal-app" class="app-window">
+        <div class="app-header">Bilder</div>
+        <div id="gallery-list" class="gallery-grid"></div>
+    </div>
+
+    <div class="home-btn" id="hb" onclick="goHome()"></div>
 </div>
 
 <script>
-    // KLOKKE
+    // System logikk
     function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+        const d = new Date();
+        document.getElementById('clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2, '0');
     }
     setInterval(updateClock, 1000); updateClock();
 
-    // APP NAVIGASJON
     function openApp(id) {
         document.getElementById(id).classList.add('active');
-        if(id === 'camera-app') startCamera();
+        document.getElementById('hb').classList.add('dark');
+        if(id === 'cam-app') startCam();
+        if(id === 'gal-app') loadGallery();
     }
     function goHome() {
-        document.querySelectorAll('.app-window').forEach(app => app.classList.remove('active'));
-        closeCamera();
+        document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active'));
+        document.getElementById('hb').classList.remove('dark');
+        stopCam();
     }
 
-    // MELDINGER OG LOCALSTORAGE
-    let messages = JSON.parse(localStorage.getItem('my_messages')) || [
-        {text: "Velkommen til din nye mobil!", type: "them"}
-    ];
-
-    function renderMessages() {
-        const list = document.getElementById('message-list');
-        list.innerHTML = messages.map(m => `<div class="msg ${m.type}">${m.text}</div>`).join('');
-        list.scrollTop = list.scrollHeight;
+    // Chat logikk
+    let chat = JSON.parse(localStorage.getItem('chat_db')) || [{t: "Hei! Har du sett den nye mobilen min?", s: "friend"}];
+    function renderChat() {
+        document.getElementById('msg-content').innerHTML = chat.map(m => `<div class="bubble ${m.s}">${m.t}</div>`).join('');
     }
-    renderMessages();
-
-    function sendMessage() {
-        const input = document.getElementById('msgInput');
-        if(!input.value) return;
-
-        messages.push({text: input.value, type: "me"});
-        const userText = input.value.toLowerCase();
-        input.value = "";
-        
-        // Simuler svar
-        setTimeout(() => {
-            let reply = "Det høres spennende ut!";
-            if(userText.includes("hei")) reply = "Heisann! Hvordan går det?";
-            messages.push({text: reply, type: "them"});
-            saveAndRender();
+    function sendMsg() {
+        const i = document.getElementById('msg-input');
+        if(!i.value) return;
+        chat.push({t: i.value, s: "me"});
+        setTimeout(() => { 
+            chat.push({t: "Kult! Skal vi teste kameraet?", s: "friend"}); 
+            renderChat(); 
+            localStorage.setItem('chat_db', JSON.stringify(chat));
         }, 1000);
+        i.value = ""; renderChat();
+    }
+    renderChat();
 
-        saveAndRender();
+    // Kamera & Galleri logikk
+    let stream;
+    async function startCam() {
+        stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}});
+        document.getElementById('camera-feed').srcObject = stream;
+    }
+    function stopCam() { if(stream) stream.getTracks().forEach(t => t.stop()); }
+
+    function takePhoto() {
+        const v = document.getElementById('camera-feed');
+        const canvas = document.createElement('canvas');
+        canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+        canvas.getContext('2d').drawImage(v, 0, 0);
+        const data = canvas.toDataURL('image/png');
+        let photos = JSON.parse(localStorage.getItem('photos')) || [];
+        photos.unshift(data);
+        localStorage.setItem('photos', JSON.stringify(photos));
+        alert("Bilde lagret i Galleri!");
     }
 
-    function saveAndRender() {
-        localStorage.setItem('my_messages', JSON.stringify(messages));
-        renderMessages();
+    function loadGallery() {
+        const photos = JSON.parse(localStorage.getItem('photos')) || [];
+        document.getElementById('gallery-list').innerHTML = photos.map(p => `<img src="${p}">`).join('');
     }
 
-    // KAMERA TILLATELSE
-    let stream = null;
-    async function startCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            document.getElementById('camera-video').srcObject = stream;
-        } catch (err) {
-            alert("Kamera-tilgang nektet eller ikke tilgjengelig.");
-        }
+    // Browser
+    function browse() {
+        const url = document.getElementById('url-bar').value;
+        document.getElementById('frame').src = "https://www.google.com/search?q=" + encodeURIComponent(url) + "&igu=1";
     }
-    function closeCamera() {
-        if(stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    }
-
-    // NETTLESER
-    document.getElementById('urlBar').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            document.getElementById('browserFrame').src = "https://www.google.com/search?q=" + encodeURIComponent(this.value) + "&igu=1";
-        }
-    });
 </script>
-
 </body>
 </html>
