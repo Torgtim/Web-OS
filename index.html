@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Min Mini-Nettleser</title>
+    <style>
+        body { font-family: sans-serif; background: #222; margin: 0; padding: 20px; color: white; }
+        .browser-container { max-width: 1000px; margin: auto; border: 2px solid #444; border-radius: 10px; overflow: hidden; background: #333; }
+        .toolbar { padding: 10px; display: flex; gap: 10px; background: #444; }
+        input { flex-grow: 1; padding: 8px; border-radius: 5px; border: none; }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 5px; border: none; background: #007bff; color: white; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        iframe { width: 100%; height: 600px; border: none; background: white; }
+        .warning { font-size: 12px; color: #bbb; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align: center;">Min HTML-Nettleser</h2>
+
+    <div class="browser-container">
+        <div class="toolbar">
+            <input type="text" id="urlInput" placeholder="Skriv URL (f.eks. https://wikipedia.org) eller søk på Google...">
+            <button onclick="navigate()">Gå til / Søk</button>
+        </div>
+        <div class="warning">Merk: Mange sider (som Google/Facebook) blokkerer visning i rammer av sikkerhetsgrunner.</div>
+        
+        <iframe id="browserView" src="about:blank"></iframe>
+    </div>
+
+    <script>
+        function navigate() {
+            const input = document.getElementById('urlInput').value;
+            const iframe = document.getElementById('browserView');
+
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                // Hvis det er en URL, prøv å åpne den
+                iframe.src = input;
+            } else {
+                // Hvis ikke, gjør det til et Google-søk
+                const searchUrl = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
+                iframe.src = searchUrl;
+            }
+        }
+
+        // Gjør det mulig å trykke "Enter"
+        document.getElementById('urlInput').addEventListener("keyup", function(event) {
+            if (event.key === "Enter") { navigate(); }
+        });
+    </script>
+
+</body>
+</html>
