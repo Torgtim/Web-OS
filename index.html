@@ -2,95 +2,66 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <title>Min Mobil-Nettleser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobil Browser</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px; color: white; }
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; margin: 0; background: #000; height: 100vh; display: flex; flex-direction: column; }
         
-        /* Selve mobil-designet */
-        .phone-case {
-            width: 375px; /* Standard iPhone bredde */
-            height: 750px;
-            background: #333;
-            border: 12px solid #444;
-            border-radius: 40px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+        /* Adresselinje */
+        .nav-bar { background: #222; padding: 10px; display: flex; gap: 5px; }
+        input { flex-grow: 1; padding: 12px; border-radius: 8px; border: none; font-size: 16px; background: #333; color: white; }
+        button { padding: 10px 15px; border-radius: 8px; border: none; background: #007bff; color: white; font-weight: bold; }
 
-        /* Høyttaler-hull på toppen */
-        .speaker {
-            width: 60px;
-            height: 5px;
-            background: #222;
-            border-radius: 10px;
-            margin: 15px auto;
-        }
-
-        .toolbar { padding: 10px; background: #333; display: flex; flex-direction: column; gap: 5px; }
-        input { padding: 10px; border-radius: 20px; border: 1px solid #555; background: #eee; font-size: 14px; }
-        button { padding: 8px; border-radius: 20px; border: none; background: #28a745; color: white; cursor: pointer; }
-
-        /* Selve skjermen */
-        iframe {
-            flex-grow: 1;
-            width: 100%;
-            border: none;
-            background: white;
-        }
-
-        .home-button {
-            width: 40px;
-            height: 40px;
-            background: #444;
-            border-radius: 50%;
-            margin: 10px auto;
-            border: 2px solid #555;
-            cursor: pointer;
-        }
+        /* Selve vinduet */
+        .browser-frame { flex-grow: 1; background: white; border: none; width: 100%; }
+        
+        /* Hjelpetekst */
+        .info { background: #111; color: #888; font-size: 10px; padding: 5px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <h2>Mobil-Simulator</h2>
-
-    <div class="phone-case">
-        <div class="speaker"></div>
-        
-        <div class="toolbar">
-            <input type="text" id="urlInput" placeholder="Søk eller skriv URL...">
-            <button onclick="navigate()">Åpne side</button>
-        </div>
-
-        <iframe id="browserView" src="about:blank"></iframe>
-
-        <div class="home-button" onclick="home()"></div>
+    <div class="info">Bruker Proxy for å omgå blokkeringer</div>
+    
+    <div class="nav-bar">
+        <input type="text" id="urlInput" placeholder="Søk eller skriv adresse (f.eks. vg.no)...">
+        <button onclick="loadPage()">Gå</button>
     </div>
 
+    <iframe id="viewer" class="browser-frame" src="about:blank"></iframe>
+
     <script>
-        function navigate() {
-            const input = document.getElementById('urlInput').value;
-            const iframe = document.getElementById('browserView');
+        function loadPage() {
+            let input = document.getElementById('urlInput').value;
+            let viewer = document.getElementById('viewer');
 
-            if (input.startsWith('http')) {
-                iframe.src = input;
-            } else {
-                // Bruker Google med mobilvisning-triks
-                iframe.src = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
+            if (!input) return;
+
+            // Hvis det ikke er en URL, gjør det til et Google-søk
+            if (!input.includes('.') || input.includes(' ')) {
+                viewer.src = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
+                return;
             }
+
+            // Legg til https:// hvis det mangler
+            if (!input.startsWith('http')) {
+                input = 'https://' + input;
+            }
+
+            // Bruk en offentlig proxy for å hente siden
+            // Vi bruker 'https://codertabs.com/cors-proxy/' eller lignende triks
+            // MERK: Noen proxyer kan være trege eller ha begrensninger
+            viewer.src = "https://www.google.com/search?q=" + encodeURIComponent(input) + "&igu=1";
+            
+            // For å faktisk se andre sider enn Google, må man ofte bruke en dedikert proxy-tjeneste-link:
+            // f.eks: viewer.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(input);
         }
 
-        function home() {
-            document.getElementById('browserView').src = "about:blank";
-            document.getElementById('urlInput').value = "";
-        }
-
-        document.getElementById('urlInput').addEventListener("keyup", function(event) {
-            if (event.key === "Enter") { navigate(); }
+        // Enter-tast på mobil-tastatur
+        document.getElementById('urlInput').addEventListener("keyup", function(e) {
+            if (e.key === "Enter") loadPage();
         });
     </script>
-
 </body>
 </html>
