@@ -3,159 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Min Virtuelle Mobil</title>
+    <title>Min AI Mobil</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-gray: #1C1C1E; }
+        :root { --ios-blue: #007AFF; --ios-bg: #f2f2f7; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; padding: 0; 
-            background: #000; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; 
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-        }
+        body { margin: 0; background: #111; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; }
 
-        /* Selve telefon-rammen */
         .phone {
-            width: 100%; height: 100%;
-            max-width: 400px; max-height: 850px;
-            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=500&q=80');
-            background-size: cover;
-            position: relative;
-            border-radius: 40px;
-            border: 8px solid #333;
-            overflow: hidden;
+            width: 100%; height: 100%; max-width: 414px; max-height: 896px;
+            background: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=500') center/cover;
+            position: relative; border-radius: 40px; border: 8px solid #333; overflow: hidden;
             display: flex; flex-direction: column;
         }
 
-        /* Statusbar på toppen */
-        .status-bar {
-            height: 44px; padding: 0 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            color: white; font-size: 14px; font-weight: 600;
-            z-index: 100;
+        /* Status Bar */
+        .status-bar { height: 44px; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: 600; z-index: 1000; }
+
+        /* Home Screen */
+        .home-screen { flex-grow: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 100px; gap: 20px; padding: 40px 20px; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; animation: fadeIn 0.5s ease; }
+        .icon-box { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        /* App Window System */
+        .app-window {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
+            z-index: 500; display: flex; flex-direction: column;
         }
+        .app-window.active { transform: translateY(0); }
+        .app-header { padding: 40px 15px 10px; background: #f9f9f9; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Hjem-skjerm med apper */
-        .home-screen {
-            flex-grow: 1; display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(5, 1fr);
-            gap: 20px; padding: 30px 20px;
-            transition: transform 0.4s ease;
-        }
+        /* Messages App */
+        #message-list { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: white; }
+        .msg { padding: 8px 12px; border-radius: 18px; max-width: 75%; font-size: 14px; }
+        .msg.me { background: var(--ios-blue); color: white; align-self: flex-end; }
+        .msg.them { background: #e5e5ea; color: black; align-self: flex-start; }
+        .input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #ddd; }
+        input { flex-grow: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; }
 
-        .app-icon {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            cursor: pointer;
-        }
+        /* Camera View */
+        #camera-video { width: 100%; height: 100%; object-fit: cover; background: black; }
 
-        .icon-box {
-            width: 60px; height: 60px;
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .app-label { color: white; font-size: 12px; }
-
-        /* Nettleser-Appen (Skjult som standard) */
-        #browser-app {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column;
-            z-index: 200;
-        }
-
-        #browser-app.open { transform: translateY(0); }
-
-        .browser-header { background: #f1f1f1; padding: 40px 10px 10px; display: flex; gap: 10px; }
-        .url-input { flex-grow: 1; padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
-        
-        iframe { flex-grow: 1; border: none; width: 100%; background: white; }
-
-        /* Hjem-knapp (Sveipestripe nederst) */
         .home-indicator {
-            width: 120px; height: 5px; background: white;
-            border-radius: 10px; position: absolute; bottom: 8px; left: 50%;
-            transform: translateX(-50%); z-index: 300; cursor: pointer;
+            width: 130px; height: 5px; background: #fff; border-radius: 10px;
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 2000; cursor: pointer;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="phone">
-        <div class="status-bar">
-            <div id="clock">12:00</div>
-            <div style="display:flex; gap: 5px;">📶 🔋</div>
-        </div>
-
-        <div class="home-screen" id="home">
-            <div class="app-icon" onclick="openApp()">
-                <div class="icon-box" style="background: linear-gradient(#54e38e, #41c172);">🌐</div>
-                <span class="app-label">Browser</span>
-            </div>
-            <div class="app-icon">
-                <div class="icon-box" style="background: #ff9500;">⚙️</div>
-                <span class="app-label">Innstillinger</span>
-            </div>
-            <div class="app-icon">
-                <div class="icon-box" style="background: #ff3b30;">📸</div>
-                <span class="app-label">Kamera</span>
-            </div>
-        </div>
-
-        <div id="browser-app">
-            <div class="browser-header">
-                <input type="text" id="urlInput" class="url-input" placeholder="Søk eller skriv URL...">
-                <button onclick="navigate()" style="border:none; background:none; color:var(--ios-blue); font-weight:bold;">Gå</button>
-            </div>
-            <iframe id="browserIframe" src="about:blank"></iframe>
-        </div>
-
-        <div class="home-indicator" onclick="goHome()"></div>
+<div class="phone">
+    <div class="status-bar">
+        <div id="clock">12:00</div>
+        <div>📶 🔋</div>
     </div>
 
-    <script>
-        // Oppdater klokka
-        function updateClock() {
-            const now = new Date();
-            const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('clock').innerText = time;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    <div class="home-screen">
+        <div class="app-icon" onclick="openApp('messages-app')">
+            <div class="icon-box" style="background: #34C759;">💬</div>
+            <span style="color:white; font-size:12px;">Meldinger</span>
+        </div>
+        <div class="app-icon" onclick="openApp('browser-app')">
+            <div class="icon-box" style="background: #5856D6;">🌐</div>
+            <span style="color:white; font-size:12px;">Nettleser</span>
+        </div>
+        <div class="app-icon" onclick="openApp('camera-app')">
+            <div class="icon-box" style="background: #8E8E93;">📷</div>
+            <span style="color:white; font-size:12px;">Kamera</span>
+        </div>
+    </div>
 
-        // App-styring
-        function openApp() {
-            document.getElementById('browser-app').classList.add('open');
-        }
+    <div id="messages-app" class="app-window">
+        <div class="app-header"><b>Meldinger</b></div>
+        <div id="message-list"></div>
+        <div class="input-area">
+            <input type="text" id="msgInput" placeholder="Skriv en melding...">
+            <button onclick="sendMessage()" style="border:none; color:var(--ios-blue); background:none; font-weight:bold;">Send</button>
+        </div>
+    </div>
 
-        function goHome() {
-            document.getElementById('browser-app').classList.remove('open');
-        }
+    <div id="browser-app" class="app-window">
+        <div class="app-header">
+            <input type="text" id="urlBar" placeholder="Søk på Google..." style="width:100%;">
+        </div>
+        <iframe id="browserFrame" style="flex-grow:1; border:none;" src="about:blank"></iframe>
+    </div>
 
-        // Nettleser-logikk
-        function navigate() {
-            let url = document.getElementById('urlInput').value;
-            const iframe = document.getElementById('browserIframe');
-            
-            if (!url.startsWith('http')) {
-                // Bruker Google med IGU-trikset for å tillate visning
-                iframe.src = "https://www.google.com/search?q=" + encodeURIComponent(url) + "&igu=1";
-            } else {
-                iframe.src = url;
-            }
-        }
+    <div id="camera-app" class="app-window">
+        <div class="app-header"><b>Kamera</b> <button onclick="closeCamera()" style="border:none; background:none; color:red;">Av</button></div>
+        <video id="camera-video" autoplay playsinline></video>
+        <div style="position:absolute; bottom:50px; width:100%; display:flex; justify-content:center;">
+            <div style="width:70px; height:70px; border:5px solid white; border-radius:50%;"></div>
+        </div>
+    </div>
+
+    <div class="home-indicator" onclick="goHome()"></div>
+</div>
+
+<script>
+    // KLOKKE
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    // APP NAVIGASJON
+    function openApp(id) {
+        document.getElementById(id).classList.add('active');
+        if(id === 'camera-app') startCamera();
+    }
+    function goHome() {
+        document.querySelectorAll('.app-window').forEach(app => app.classList.remove('active'));
+        closeCamera();
+    }
+
+    // MELDINGER OG LOCALSTORAGE
+    let messages = JSON.parse(localStorage.getItem('my_messages')) || [
+        {text: "Velkommen til din nye mobil!", type: "them"}
+    ];
+
+    function renderMessages() {
+        const list = document.getElementById('message-list');
+        list.innerHTML = messages.map(m => `<div class="msg ${m.type}">${m.text}</div>`).join('');
+        list.scrollTop = list.scrollHeight;
+    }
+    renderMessages();
+
+    function sendMessage() {
+        const input = document.getElementById('msgInput');
+        if(!input.value) return;
+
+        messages.push({text: input.value, type: "me"});
+        const userText = input.value.toLowerCase();
+        input.value = "";
         
-        // Enter-tast
-        document.getElementById('urlInput').addEventListener("keyup", function(e) {
-            if (e.key === "Enter") navigate();
-        });
-    </script>
+        // Simuler svar
+        setTimeout(() => {
+            let reply = "Det høres spennende ut!";
+            if(userText.includes("hei")) reply = "Heisann! Hvordan går det?";
+            messages.push({text: reply, type: "them"});
+            saveAndRender();
+        }, 1000);
+
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('my_messages', JSON.stringify(messages));
+        renderMessages();
+    }
+
+    // KAMERA TILLATELSE
+    let stream = null;
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            document.getElementById('camera-video').srcObject = stream;
+        } catch (err) {
+            alert("Kamera-tilgang nektet eller ikke tilgjengelig.");
+        }
+    }
+    function closeCamera() {
+        if(stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    // NETTLESER
+    document.getElementById('urlBar').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            document.getElementById('browserFrame').src = "https://www.google.com/search?q=" + encodeURIComponent(this.value) + "&igu=1";
+        }
+    });
+</script>
+
 </body>
 </html>
