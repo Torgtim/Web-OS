@@ -3,138 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperMobil v10 - Komplett Arkiv</title>
+    <title>SuperMobil v11 - Ultimate</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-grey: #8E8E93; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --bg-color: #f2f2f7; --text-color: #000; --app-bg: #fff; }
+        body.dark-mode { --bg-color: #000; --text-color: #fff; --app-bg: #1c1c1e; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
+        body { background: #111; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        .phone-frame { width: 380px; height: 780px; background: #000; border-radius: 50px; border: 12px solid #333; position: relative; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        /* RAMME */
+        .phone-frame { width: 380px; height: 780px; background: #000; border-radius: 50px; border: 12px solid #333; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; }
         .screen { flex-grow: 1; position: relative; overflow: hidden; background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover; border-radius: 30px; margin: 5px; }
 
-        /* HJEMSKJERM */
-        .home-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 25px; }
-        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
-        .icon-box { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .app-label { color: white; font-size: 10px; font-weight: 500; text-align: center; }
-
+        /* LÅSESKJERM */
+        #lock-screen { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        
         /* APP VINDUER */
-        .app-window { position: absolute; inset: 0; background: white; transform: translateY(110%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 500; display: flex; flex-direction: column; }
+        .app-window { position: absolute; inset: 0; background: var(--app-bg); color: var(--text-color); transform: translateY(110%); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 500; display: flex; flex-direction: column; }
         .app-window.active { transform: translateY(0); }
-        .app-header { padding: 40px 20px 10px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
+        .app-header { padding: 45px 20px 15px; background: var(--app-bg); border-bottom: 1px solid #333; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 18px; }
 
-        /* SPESIFIKKE DESIGN */
-        #snake-canvas { background: #000; display: block; margin: 0 auto; border: 2px solid #333; }
-        .note-item { padding: 15px; border-bottom: 1px solid #eee; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; background: #000; flex-grow: 1; }
-        .calc-btn { height: 60px; border-radius: 30px; border: none; font-size: 20px; color: white; background: #333; }
+        /* HJEMSKJERM */
+        .home-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 25px; align-content: start; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .icon-box { width: 58px; height: 58px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); background: #fff; }
+        .app-label { color: white; font-size: 11px; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+        /* SNAKE */
+        .snake-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; background: #222; margin-top: auto; }
+        .s-btn { background: #444; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 20px; }
+
+        /* KALKULATOR */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; flex-grow: 1; background: #000; }
+        .c-btn { border-radius: 50%; border: none; font-size: 24px; font-weight: 500; cursor: pointer; height: 70px; width: 70px; margin: auto; }
+        .c-dark { background: #333; color: white; } .c-orange { background: #ff9f0a; color: white; } .c-grey { background: #a5a5a5; color: black; }
+
+        /* LISTER (Filer, Notater, Musikk) */
+        .list-item { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { color: #ff453a; background: none; border: none; font-weight: bold; padding: 5px 10px; cursor: pointer; }
+
+        /* SETTINGS */
+        .setting-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .toggle { width: 50px; height: 30px; background: #ccc; border-radius: 20px; position: relative; transition: 0.3s; }
+        .toggle.on { background: #34C759; }
+        .toggle::after { content:''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; transition: 0.3s; }
+        .toggle.on::after { left: 22px; }
+
+        /* KAMERA & GALLERI */
+        #gal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+        .gal-img-wrap { position: relative; aspect-ratio: 1; }
+        .gal-del { position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; }
+
+        /* TEGNE APP */
+        #paint-canvas { background: white; touch-action: none; flex-grow: 1; }
         
         /* HJEM-KNAPP */
-        .home-btn-area { height: 65px; display: flex; justify-content: center; align-items: center; }
-        .home-circle { width: 45px; height: 45px; border: 3px solid #444; border-radius: 50%; cursor: pointer; }
+        .home-area { height: 60px; display: flex; justify-content: center; align-items: center; background: #000; z-index: 1000; }
+        .home-pill { width: 130px; height: 5px; background: #fff; border-radius: 10px; opacity: 0.5; }
     </style>
 </head>
-<body>
+<body onload="boot()">
 
 <div class="phone-frame">
-    <div class="screen" id="main-screen">
-        <div style="height:30px; padding:10px 20px; color:white; display:flex; justify-content:space-between; font-size:12px; position:relative; z-index:1000;">
-            <span id="clock">12:00</span><span>📶 🔋</span>
+    <div id="lock-screen">
+        <h1 style="margin-bottom:20px;">🔒 Låst</h1>
+        <input type="password" id="pass-input" placeholder="Kode" style="font-size:24px; padding:10px; text-align:center; width:150px; border-radius:10px; margin-bottom:20px;">
+        <button onclick="tryUnlock()" style="padding:10px 30px; background: #007AFF; color: white; border: none; border-radius: 20px; font-size: 18px;">Lås opp</button>
+        <p id="lock-msg" style="color:#ff453a; margin-top:10px;"></p>
+    </div>
+
+    <div class="screen" id="screen">
+        <div style="height:30px; padding:10px 20px; color:white; display:flex; justify-content:space-between; font-size:12px; z-index: 100;">
+            <span id="clock">12:00</span><span>📶 100%</span>
         </div>
 
         <div class="home-grid">
-            <div class="app-icon" onclick="openApp('app-music')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
-            <div class="app-icon" onclick="openApp('app-snake')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
-            <div class="app-icon" onclick="openApp('app-web')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
-            <div class="app-icon" onclick="openApp('app-cam')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
-            <div class="app-icon" onclick="openApp('app-gal')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
-            <div class="app-icon" onclick="openApp('app-calc')"><div class="icon-box" style="background:#FF9500;">➗</div><span class="app-label">Kalkulator</span></div>
-            <div class="app-icon" onclick="openApp('app-notes')"><div class="icon-box" style="background:#FEE34C;">📝</div><span class="app-label">Notater</span></div>
-            <div class="app-icon" onclick="openApp('app-file')"><div class="icon-box" style="background:#A2845E;">📁</div><span class="app-label">Filer</span></div>
-            <div class="app-icon" onclick="openApp('app-weather')"><div class="icon-box" style="background:#5AC8FA;">☀️</div><span class="app-label">Vær</span></div>
-            <div class="app-icon" onclick="openApp('app-chat')"><div class="icon-box" style="background:#34C759;">💬</div><span class="app-label">Chat</span></div>
-            <div class="app-icon" onclick="openApp('app-set')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Settings</span></div>
+            <div class="app-icon" onclick="openApp('music')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
+            <div class="app-icon" onclick="openApp('snake')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
+            <div class="app-icon" onclick="openApp('web')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
+            <div class="app-icon" onclick="openApp('cam')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
+            <div class="app-icon" onclick="openApp('gal')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
+            <div class="app-icon" onclick="openApp('calc')"><div class="icon-box" style="background:#FF9500;">➗</div><span class="app-label">Kalkulator</span></div>
+            <div class="app-icon" onclick="openApp('notes')"><div class="icon-box" style="background:#FEE34C;">📝</div><span class="app-label">Notater</span></div>
+            <div class="app-icon" onclick="openApp('files')"><div class="icon-box" style="background:#A2845E;">📁</div><span class="app-label">Filer</span></div>
+            <div class="app-icon" onclick="openApp('paint')"><div class="icon-box" style="background:#fff; border:1px solid #ddd;">🎨</div><span class="app-label">Tegne</span></div>
+            <div class="app-icon" onclick="openApp('settings')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Innstillinger</span></div>
         </div>
 
-        <div id="app-notes" class="app-window">
-            <div class="app-header">Notater <span onclick="addNote()" style="color:var(--ios-blue)">+ Ny</span></div>
-            <div id="notes-list" style="overflow-y:auto; flex-grow:1;"></div>
-            <div id="note-editor" style="display:none; position:absolute; inset:0; background:white; padding-top:50px;">
-                <button onclick="saveNote()" style="margin:10px;">Lagre</button>
-                <textarea id="note-text" style="width:100%; height:80%; padding:20px; border:none; outline:none; font-size:18px;"></textarea>
-            </div>
-        </div>
-
-        <div id="app-music" class="app-window">
-            <div class="app-header">Musikk <label>➕<input type="file" hidden accept="audio/*" onchange="addMusic(event)"></label></div>
-            <div style="padding:20px; text-align:center; background:#eee;">
-                <h4 id="m-title">Velg en sang</h4>
-                <div style="margin:15px 0;">
-                    <button onclick="skip(-1)">⏮</button> <button onclick="togglePlay()" id="play-btn">▶️</button> <button onclick="skip(1)">⏭</button>
+        <div id="music" class="app-window">
+            <div class="app-header">Musikk <label style="color:#007AFF">➕<input type="file" hidden accept="audio/*" onchange="impMusic(event)"></label></div>
+            <div style="padding:20px; text-align:center; background:rgba(0,0,0,0.05);">
+                <div style="font-size:50px; margin-bottom:10px;">💿</div>
+                <h4 id="m-title">Ingen sang</h4>
+                <div style="margin:20px 0; display:flex; justify-content:center; gap:20px; align-items:center;">
+                    <button onclick="skip(-1)" class="s-btn" style="padding:10px;">⏮</button>
+                    <button onclick="playPause()" id="play-btn" class="s-btn" style="padding:15px; background:#FF2D55;">▶️</button>
+                    <button onclick="skip(1)" class="s-btn" style="padding:10px;">⏭</button>
                 </div>
+                <button onclick="changeSpeed()" id="spd-btn" style="padding:5px 10px; border-radius:10px; border:none;">1x</button>
             </div>
             <div id="song-list" style="overflow-y:auto; flex-grow:1;"></div>
         </div>
 
-        <div id="app-snake" class="app-window"><div class="app-header">Snake <span id="score">0</span></div><canvas id="snake-canvas" width="280" height="280"></canvas><button onclick="startSnake()" id="die-btn" style="display:none; color:red; padding:20px;">DØD! Prøv igjen?</button></div>
-        <div id="app-web" class="app-window"><div class="app-header">Safari</div><input type="text" id="url" placeholder="Søk..." style="padding:10px; margin:5px;"><iframe id="web" style="flex-grow:1; border:none;" src="https://www.bing.com"></iframe></div>
-        <div id="app-calc" class="app-window"><div class="app-header">Kalkulator</div><div id="c-res" style="background:#000; color:white; text-align:right; padding:30px; font-size:40px;">0</div><div class="calc-grid"><button class="calc-btn" onclick="cIn('7')">7</button><button class="calc-btn" onclick="cIn('8')">8</button><button class="calc-btn" onclick="cIn('9')">9</button><button class="calc-btn" style="background:#ff9500" onclick="cRes()">=</button></div></div>
-        <div id="app-cam" class="app-window" style="background:#000;"><video id="v" autoplay playsinline style="width:100%; height:70%; object-fit:cover;"></video><button onclick="takePic()" style="width:60px; height:60px; border-radius:50%; border:4px solid white; background:none; margin: 20px auto; display:block;"></button></div>
-        <div id="app-gal" class="app-window"><div class="app-header">Galleri</div><div id="gal-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px;"></div></div>
-        <div id="app-file" class="app-window"><div class="app-header">Filer</div><div id="file-content" style="padding:20px;"></div></div>
-        <div id="app-weather" class="app-window" style="background:linear-gradient(#4facfe, #00f2fe);"><div class="app-header" style="background:transparent;">Vær</div><div style="text-align:center; padding-top:40px; color:white;"><h1>Oslo</h1><h2>18°☀️</h2></div></div>
-        <div id="app-chat" class="app-window"><div class="app-header">Chat</div><div id="chat-out" style="flex-grow:1; padding:10px;"></div><input id="chat-in" style="padding:10px;"></div>
-        <div id="app-set" class="app-window"><div class="app-header">Settings</div><button onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')" style="padding:20px;">Bytt Bakgrunn</button></div>
+        <div id="snake" class="app-window" style="background:#000; color:#fff;">
+            <div class="app-header" style="background:#000; border-color:#333;">Snake <span id="score">0</span></div>
+            <canvas id="snake-canvas" width="300" height="300" style="margin:10px auto; border:2px solid #333; background:#111;"></canvas>
+            <h3 id="game-over" style="display:none; color:red; text-align:center;">DØD!</h3>
+            <div class="snake-controls">
+                <div></div><button class="s-btn" onclick="d='UP'">▲</button><div></div>
+                <button class="s-btn" onclick="d='LEFT'">◀</button><button class="s-btn" onclick="startSnake()">🔄</button><button class="s-btn" onclick="d='RIGHT'">▶</button>
+                <div></div><button class="s-btn" onclick="d='DOWN'">▼</button><div></div>
+            </div>
+        </div>
+
+        <div id="web" class="app-window">
+            <div class="app-header">Safari</div>
+            <div style="display:flex; padding:10px; gap:5px; background:#eee;">
+                <input type="text" id="url" placeholder="Søk..." style="flex-grow:1; padding:8px; border-radius:8px; border:1px solid #ccc;">
+                <button onclick="goUrl()" style="padding:8px 15px; background:#007AFF; color:white; border:none; border-radius:8px;">Gå</button>
+            </div>
+            <iframe id="web-frame" style="flex-grow:1; border:none;" src="about:blank"></iframe>
+        </div>
+
+        <div id="cam" class="app-window" style="background:#000;">
+            <video id="vid" autoplay playsinline style="width:100%; height:75%; object-fit:cover;"></video>
+            <div style="flex-grow:1; display:flex; justify-content:space-around; align-items:center;">
+                <button onclick="flipCam()" style="font-size:24px; background:none; border:none; color:white;">🔄</button>
+                <button onclick="snap()" style="width:70px; height:70px; border-radius:50%; border:5px solid white; background:none;"></button>
+                <div style="width:40px;"></div>
+            </div>
+        </div>
+
+        <div id="gal" class="app-window">
+            <div class="app-header">Galleri</div>
+            <div id="gal-grid" style="padding:5px; overflow-y:auto;"></div>
+        </div>
+
+        <div id="calc" class="app-window" style="background:black;">
+            <div id="calc-disp" style="color:white; font-size:50px; text-align:right; padding:20px;">0</div>
+            <div class="calc-grid">
+                <button class="c-btn c-grey" onclick="cClr()">C</button><button class="c-btn c-grey" onclick="cOp('/')">/</button><button class="c-btn c-grey" onclick="cOp('*')">X</button><button class="c-btn c-grey" onclick="cDel()">⌫</button>
+                <button class="c-btn c-dark" onclick="cNum(7)">7</button><button class="c-btn c-dark" onclick="cNum(8)">8</button><button class="c-btn c-dark" onclick="cNum(9)">9</button><button class="c-btn c-orange" onclick="cOp('-')">-</button>
+                <button class="c-btn c-dark" onclick="cNum(4)">4</button><button class="c-btn c-dark" onclick="cNum(5)">5</button><button class="c-btn c-dark" onclick="cNum(6)">6</button><button class="c-btn c-orange" onclick="cOp('+')">+</button>
+                <button class="c-btn c-dark" onclick="cNum(1)">1</button><button class="c-btn c-dark" onclick="cNum(2)">2</button><button class="c-btn c-dark" onclick="cNum(3)">3</button><button class="c-btn c-orange" onclick="cEq()">=</button>
+                <button class="c-btn c-dark" style="grid-column:span 2; width:100%; border-radius:40px;" onclick="cNum(0)">0</button><button class="c-btn c-dark" onclick="cNum('.')">.</button>
+            </div>
+        </div>
+
+        <div id="notes" class="app-window">
+            <div class="app-header">Notater <span onclick="newNote()" style="color:#007AFF">+ Ny</span></div>
+            <div id="note-list" style="overflow-y:auto; flex-grow:1;"></div>
+            <div id="note-edit" style="position:absolute; inset:0; background:var(--app-bg); display:none; flex-direction:column;">
+                <div style="padding:10px; display:flex; justify-content:space-between;">
+                    <button onclick="closeNote()">Avbryt</button><button onclick="saveNote()">Lagre</button>
+                </div>
+                <textarea id="note-in" style="flex-grow:1; padding:20px; font-size:18px; border:none; background:transparent; color:var(--text-color);"></textarea>
+            </div>
+        </div>
+
+        <div id="files" class="app-window">
+            <div class="app-header">Filer</div>
+            <div id="file-list" style="overflow-y:auto; padding:10px;"></div>
+        </div>
+
+        <div id="paint" class="app-window">
+            <div class="app-header">Tegne <span onclick="clearPaint()" style="color:red">Slett</span></div>
+            <canvas id="paint-canvas"></canvas>
+            <div style="padding:10px; display:flex; justify-content:center; gap:10px; background:#eee;">
+                <button onclick="pColor='black'" style="background:black; width:30px; height:30px; border-radius:50%;"></button>
+                <button onclick="pColor='red'" style="background:red; width:30px; height:30px; border-radius:50%;"></button>
+                <button onclick="pColor='blue'" style="background:blue; width:30px; height:30px; border-radius:50%;"></button>
+                <button onclick="pColor='green'" style="background:green; width:30px; height:30px; border-radius:50%;"></button>
+            </div>
+        </div>
+
+        <div id="settings" class="app-window">
+            <div class="app-header">Innstillinger</div>
+            <div class="setting-row">
+                <span>Dark Mode</span> <div id="dark-tog" class="toggle" onclick="togDark()"></div>
+            </div>
+            <div class="setting-row">
+                <span>Passkode Lås</span> <div id="code-tog" class="toggle" onclick="togCode()"></div>
+            </div>
+            <div id="code-set" class="setting-row" style="display:none;">
+                <input type="text" id="set-code" placeholder="Ny kode" style="padding:5px; width:100px;">
+                <button onclick="saveCode()">Lagre</button>
+            </div>
+            <div style="padding:15px; font-weight:bold; color:gray;">Bakgrunnsbilde</div>
+            <div style="display:flex; gap:10px; padding:0 15px; overflow-x:auto;">
+                <div onclick="setBg('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500')" style="width:80px; height:120px; background:grey; border-radius:10px; background:url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=200') center/cover"></div>
+                <div onclick="setBg('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')" style="width:80px; height:120px; background:grey; border-radius:10px; background:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200') center/cover"></div>
+                <div onclick="setBg('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500')" style="width:80px; height:120px; background:grey; border-radius:10px; background:url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=200') center/cover"></div>
+            </div>
+        </div>
 
     </div>
-    <div class="home-btn-area"><div class="home-circle" onclick="goHome()"></div></div>
+    
+    <div class="home-area"><div class="home-pill" onclick="goHome()"></div></div>
 </div>
 
 <audio id="audio"></audio>
 
 <script>
-    let songs = [], cur = 0, notes = JSON.parse(localStorage.getItem('notes') || '[]');
-    const player = document.getElementById('audio');
+    // --- SYSTEM ---
+    let codeEnabled = false;
+    let passcode = "1234";
+    let isDark = false;
 
-    function openApp(id) { document.getElementById(id).classList.add('active'); if(id==='app-snake') startSnake(); if(id==='app-notes') renderNotes(); if(id==='app-cam') startCam(); if(id==='app-gal') renderGal(); if(id==='app-file') renderFiles(); }
-    function goHome() { document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); clearInterval(gameInt); if(stream) stream.getTracks().forEach(t=>t.stop()); }
-    function updateClock() { const d = new Date(); document.getElementById('clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2,'0'); }
-    setInterval(updateClock, 1000); updateClock();
+    function boot() {
+        setInterval(() => { const d = new Date(); document.getElementById('clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2,'0'); }, 1000);
+        if(codeEnabled) document.getElementById('lock-screen').style.display = 'flex';
+        initPaint();
+    }
 
-    // --- NOTATER ---
-    function renderNotes() { document.getElementById('notes-list').innerHTML = notes.map((n,i) => `<div class="note-item" onclick="editNote(${i})">${n.substring(0,30)}...</div>`).join(''); }
-    function addNote() { document.getElementById('note-editor').style.display = 'block'; document.getElementById('note-text').value = ''; }
-    function saveNote() { const txt = document.getElementById('note-text').value; if(txt) { notes.push(txt); localStorage.setItem('notes', JSON.stringify(notes)); } document.getElementById('note-editor').style.display = 'none'; renderNotes(); }
+    function openApp(id) { 
+        document.getElementById(id).classList.add('active'); 
+        if(id==='snake') startSnake();
+        if(id==='files') loadFiles();
+        if(id==='gal') loadGal();
+        if(id==='notes') loadNotes();
+        if(id==='cam') startCam();
+    }
+    function goHome() { 
+        document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active'));
+        if(snakeInt) clearInterval(snakeInt);
+        stopCam();
+    }
+
+    // --- LÅSESKJERM & SETTINGS ---
+    function tryUnlock() {
+        if(document.getElementById('pass-input').value === passcode) {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('pass-input').value = "";
+        } else {
+            document.getElementById('lock-msg').innerText = "Feil kode!";
+        }
+    }
+    function togDark() { 
+        isDark = !isDark; 
+        document.body.classList.toggle('dark-mode', isDark);
+        document.getElementById('dark-tog').classList.toggle('on', isDark);
+    }
+    function togCode() {
+        codeEnabled = !codeEnabled;
+        document.getElementById('code-tog').classList.toggle('on', codeEnabled);
+        document.getElementById('code-set').style.display = codeEnabled ? 'flex' : 'none';
+    }
+    function saveCode() { passcode = document.getElementById('set-code').value; alert("Kode lagret: " + passcode); }
+    function setBg(u) { document.querySelector('.screen').style.backgroundImage = `url('${u}')`; }
 
     // --- MUSIKK ---
-    function addMusic(e) { const f = e.target.files[0]; if(f) { songs.push({name:f.name, url:URL.createObjectURL(f)}); renderSongs(); } }
-    function renderSongs() { document.getElementById('song-list').innerHTML = songs.map((s,i) => `<div style="padding:15px; border-bottom:1px solid #eee;" onclick="playSong(${i})">🎵 ${s.name}</div>`).join(''); }
-    function playSong(i) { cur = i; player.src = songs[i].url; player.play(); document.getElementById('m-title').innerText = songs[i].name; document.getElementById('play-btn').innerText = "⏸"; }
-    function togglePlay() { if(player.paused) { player.play(); document.getElementById('play-btn').innerText = "⏸"; } else { player.pause(); document.getElementById('play-btn').innerText = "▶️"; } }
-    function skip(d) { let n = cur + d; if(n >= 0 && n < songs.length) playSong(n); }
+    let songs = []; let cur = 0; let speeds = [1, 1.5, 2]; let spdIdx = 0;
+    const player = document.getElementById('audio');
+
+    function impMusic(e) { const f = e.target.files[0]; if(f) { songs.push({name:f.name, url:URL.createObjectURL(f)}); loadSongs(); } }
+    function loadSongs() {
+        document.getElementById('song-list').innerHTML = songs.map((s,i) => `
+            <div class="list-item">
+                <span onclick="playS(${i})">${s.name}</span>
+                <button class="del-btn" onclick="delSong(${i})">Slett</button>
+            </div>`).join('');
+    }
+    function playS(i) { cur=i; player.src=songs[i].url; player.play(); document.getElementById('m-title').innerText=songs[i].name; document.getElementById('play-btn').innerText="⏸"; }
+    function playPause() { if(player.paused){ player.play(); document.getElementById('play-btn').innerText="⏸"; } else { player.pause(); document.getElementById('play-btn').innerText="▶️"; } }
+    function skip(d) { let n=cur+d; if(n>=0 && n<songs.length) playS(n); }
+    function delSong(i) { songs.splice(i,1); loadSongs(); }
+    function changeSpeed() { spdIdx = (spdIdx+1)%3; player.playbackRate = speeds[spdIdx]; document.getElementById('spd-btn').innerText = speeds[spdIdx] + "x"; }
 
     // --- SNAKE ---
-    let canvas = document.getElementById('snake-canvas'), ctx = canvas.getContext('2d'), snake, food, dir, gameInt, score;
-    function startSnake() { document.getElementById('die-btn').style.display='none'; snake = [{x:10,y:10}]; dir='RIGHT'; score=0; food={x:5,y:5}; gameInt = setInterval(drawS, 150); }
-    function drawS() {
-        ctx.fillStyle='black'; ctx.fillRect(0,0,280,280); ctx.fillStyle='red'; ctx.fillRect(food.x*20, food.y*20, 18, 18); ctx.fillStyle='lime'; snake.forEach(p=>ctx.fillRect(p.x*20,p.y*20,18,18));
-        let h = {...snake[0]}; if(dir==='UP') h.y--; if(dir==='DOWN') h.y++; if(dir==='LEFT') h.x--; if(dir==='RIGHT') h.x++;
-        if(h.x<0||h.x>13||h.y<0||h.y>13||snake.some(p=>p.x===h.x&&p.y===h.y)) { clearInterval(gameInt); document.getElementById('die-btn').style.display='block'; return; }
-        if(h.x===food.x && h.y===food.y) { score++; document.getElementById('score').innerText=score; food={x:Math.floor(Math.random()*14),y:Math.floor(Math.random()*14)}; } else { snake.pop(); } snake.unshift(h);
+    let cvs=document.getElementById('snake-canvas'), ctx=cvs.getContext('2d'), snk, fd, d, snakeInt, sc;
+    function startSnake() { snk=[{x:10,y:10}]; fd={x:5,y:5}; d='RIGHT'; sc=0; document.getElementById('game-over').style.display='none'; clearInterval(snakeInt); snakeInt=setInterval(loopS,150); }
+    function loopS() {
+        ctx.fillStyle='black'; ctx.fillRect(0,0,300,300); ctx.fillStyle='red'; ctx.fillRect(fd.x*20,fd.y*20,18,18); ctx.fillStyle='lime'; snk.forEach(p=>ctx.fillRect(p.x*20,p.y*20,18,18));
+        let h={...snk[0]}; if(d=='UP')h.y--; if(d=='DOWN')h.y++; if(d=='LEFT')h.x--; if(d=='RIGHT')h.x++;
+        if(h.x<0||h.x>14||h.y<0||h.y>14||snk.some(p=>p.x==h.x&&p.y==h.y)) { clearInterval(snakeInt); document.getElementById('game-over').style.display='block'; return; }
+        if(h.x==fd.x && h.y==fd.y) { sc++; document.getElementById('score').innerText=sc; fd={x:Math.floor(Math.random()*15),y:Math.floor(Math.random()*15)}; } else snk.pop(); snk.unshift(h);
     }
-    window.addEventListener('keydown', e => { if(e.key==='ArrowUp') dir='UP'; if(e.key==='ArrowDown') dir='DOWN'; if(e.key==='ArrowLeft') dir='LEFT'; if(e.key==='ArrowRight') dir='RIGHT'; });
 
-    // --- KAMERA/GALLERI/FILER ---
-    let stream;
-    async function startCam() { stream = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('v').srcObject = stream; }
-    function takePic() { const c=document.createElement('canvas'); c.width=640; c.height=480; c.getContext('2d').drawImage(document.getElementById('v'),0,0); let p=JSON.parse(localStorage.getItem('pics')||'[]'); p.push(c.toDataURL()); localStorage.setItem('pics', JSON.stringify(p)); alert("Lagret!"); }
-    function renderGal() { let p=JSON.parse(localStorage.getItem('pics')||'[]'); document.getElementById('gal-grid').innerHTML = p.map(i=>`<img src="${i}" style="width:100%; aspect-ratio:1; object-fit:cover;">`).join(''); }
-    function renderFiles() { document.getElementById('file-content').innerHTML = `Sanger: ${songs.length}<br>Bilder: ${JSON.parse(localStorage.getItem('pics')||'[]').length}<br>Notater: ${notes.length}`; }
+    // --- SAFARI ---
+    function goUrl() { 
+        let v=document.getElementById('url').value; 
+        document.getElementById('web-frame').src = v.startsWith('http') ? v : "https://www.bing.com/search?q="+v; 
+    }
 
     // --- KALKULATOR ---
-    let cD = document.getElementById('c-res');
-    function cIn(v) { if(cD.innerText==='0') cD.innerText=v; else cD.innerText+=v; }
-    function cRes() { try { cD.innerText = eval(cD.innerText); } catch { cD.innerText="Feil"; } }
+    let cExp = "";
+    function cNum(n) { cExp += n; updCalc(); }
+    function cOp(o) { cExp += o; updCalc(); }
+    function cClr() { cExp = ""; updCalc(); }
+    function cDel() { cExp = cExp.slice(0,-1); updCalc(); }
+    function cEq() { try { cExp = eval(cExp); } catch { cExp="Error"; } updCalc(); }
+    function updCalc() { document.getElementById('calc-disp').innerText = cExp || "0"; }
+
+    // --- KAMERA (FLIP) ---
+    let stream, faceMode = "user";
+    async function startCam() { 
+        if(stream) stream.getTracks().forEach(t=>t.stop());
+        stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:faceMode}}); 
+        document.getElementById('vid').srcObject = stream; 
+    }
+    function flipCam() { faceMode = faceMode==="user"?"environment":"user"; startCam(); }
+    function stopCam() { if(stream) stream.getTracks().forEach(t=>t.stop()); }
+    function snap() {
+        let c = document.createElement('canvas'); c.width=640; c.height=480; c.getContext('2d').drawImage(document.getElementById('vid'),0,0);
+        let p = JSON.parse(localStorage.getItem('pics')||'[]'); p.push(c.toDataURL()); localStorage.setItem('pics',JSON.stringify(p)); alert("Bilde tatt!");
+    }
+
+    // --- GALLERI ---
+    function loadGal() {
+        let p = JSON.parse(localStorage.getItem('pics')||'[]');
+        document.getElementById('gal-grid').innerHTML = p.map((img,i) => `
+            <div class="gal-img-wrap"><img src="${img}" style="width:100%;height:100%;object-fit:cover;">
+            <button class="gal-del" onclick="delPic(${i})">X</button></div>`).join('');
+    }
+    function delPic(i) { let p=JSON.parse(localStorage.getItem('pics')); p.splice(i,1); localStorage.setItem('pics',JSON.stringify(p)); loadGal(); }
+
+    // --- NOTATER ---
+    let nList = JSON.parse(localStorage.getItem('notes')||'[]');
+    function loadNotes() {
+        document.getElementById('note-list').innerHTML = nList.map((n,i) => `
+            <div class="list-item"><span onclick="viewNote(${i})">${n.substring(0,20)}...</span><button class="del-btn" onclick="delNote(${i})">Slett</button></div>`).join('');
+    }
+    function newNote() { document.getElementById('note-edit').style.display='flex'; document.getElementById('note-in').value=""; }
+    function saveNote() { nList.push(document.getElementById('note-in').value); localStorage.setItem('notes',JSON.stringify(nList)); document.getElementById('note-edit').style.display='none'; loadNotes(); }
+    function closeNote() { document.getElementById('note-edit').style.display='none'; }
+    function delNote(i) { nList.splice(i,1); localStorage.setItem('notes',JSON.stringify(nList)); loadNotes(); }
+
+    // --- FILER ---
+    function loadFiles() {
+        let html = "<h4>Musikk</h4>";
+        songs.forEach((s,i) => html+=`<div class="list-item">🎵 ${s.name}<button class="del-btn" onclick="delSong(${i});loadFiles()">Slett</button></div>`);
+        html += "<h4>Bilder</h4>";
+        let p = JSON.parse(localStorage.getItem('pics')||'[]');
+        p.forEach((_,i) => html+=`<div class="list-item">🖼️ Bilde_${i+1}<button class="del-btn" onclick="delPic(${i});loadFiles()">Slett</button></div>`);
+        document.getElementById('file-list').innerHTML = html;
+    }
+
+    // --- TEGNE (BONUS) ---
+    let pc = document.getElementById('paint-canvas'), pctx = pc.getContext('2d'), pColor='black', pDraw=false;
+    function initPaint() { 
+        pc.width = pc.clientWidth; pc.height = pc.clientHeight; 
+        pc.addEventListener('mousedown', () => pDraw=true);
+        pc.addEventListener('mouseup', () => {pDraw=false; pctx.beginPath();});
+        pc.addEventListener('mousemove', drawP);
+        pc.addEventListener('touchstart', (e)=>{pDraw=true; e.preventDefault()});
+        pc.addEventListener('touchend', ()=>{pDraw=false; pctx.beginPath()});
+        pc.addEventListener('touchmove', drawPTouch);
+    }
+    function drawP(e) { if(!pDraw)return; pctx.lineWidth=5; pctx.lineCap='round'; pctx.strokeStyle=pColor; pctx.lineTo(e.clientX-pc.getBoundingClientRect().left, e.clientY-pc.getBoundingClientRect().top); pctx.stroke(); pctx.beginPath(); pctx.moveTo(e.clientX-pc.getBoundingClientRect().left, e.clientY-pc.getBoundingClientRect().top); }
+    function drawPTouch(e) { if(!pDraw)return; let t=e.touches[0]; pctx.lineWidth=5; pctx.lineCap='round'; pctx.strokeStyle=pColor; pctx.lineTo(t.clientX-pc.getBoundingClientRect().left, t.clientY-pc.getBoundingClientRect().top); pctx.stroke(); pctx.beginPath(); pctx.moveTo(t.clientX-pc.getBoundingClientRect().left, t.clientY-pc.getBoundingClientRect().top); }
+    function clearPaint() { pctx.clearRect(0,0,pc.width,pc.height); }
+
 </script>
 </body>
 </html>
