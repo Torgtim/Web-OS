@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperMobil v12 - ULTIMATE</title>
+    <title>SuperMobil v13 - Real World Edition</title>
     <style>
         :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --bg-color: #f2f2f7; --text-color: #000; --app-bg: #fff; --bar-bg: rgba(255,255,255,0.8); }
         body.dark-mode { --bg-color: #000; --text-color: #fff; --app-bg: #1c1c1e; --bar-bg: rgba(20,20,20,0.9); }
@@ -54,7 +54,11 @@
         .color-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 
         /* VÆR */
-        .weather-display { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .weather-display { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); text-align: center; }
+        #w-icon { font-size: 80px; margin: 10px 0; }
+        #w-temp { font-size: 70px; font-weight: 200; }
+        #w-desc { font-size: 20px; text-transform: capitalize; }
+        #w-city { font-size: 30px; font-weight: bold; }
 
         /* KNAPPER */
         .btn-round { width: 60px; height: 60px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -120,12 +124,12 @@
         </div>
 
         <div id="weather" class="app-window" style="background: linear-gradient(to bottom, #2980b9, #6dd5fa); color:white;">
-            <div class="app-header" style="background:transparent; border:none; color:white;">Vær</div>
+            <div class="app-header" style="background:transparent; border:none; color:white;">Vær <span onclick="initWeather()" style="font-size:20px;">🔄</span></div>
             <div class="weather-display">
-                <h2 style="font-size:40px;">Oslo</h2>
-                <div style="font-size:80px;">☀️</div>
-                <h1 style="font-size:60px; font-weight:200;">19°</h1>
-                <p>Klar himmel</p>
+                <h2 id="w-city">Henter...</h2>
+                <div id="w-icon">⌛</div>
+                <h1 id="w-temp">--°</h1>
+                <p id="w-desc">Vent litt...</p>
             </div>
         </div>
 
@@ -248,20 +252,18 @@
     };
 
     function boot() {
-        // Last inn lagrede data
         const saved = localStorage.getItem('superMobilData');
         if(saved) { store = JSON.parse(saved); }
         
-        // Påfør innstillinger
         if(store.dark) document.body.classList.add('dark-mode');
         document.getElementById('dark-tog').classList.toggle('on', store.dark);
         document.getElementById('code-tog').classList.toggle('on', store.codeOn);
         document.getElementById('code-set').style.display = store.codeOn ? 'flex' : 'none';
         document.getElementById('main-screen').style.backgroundImage = `url('${store.bg}')`;
 
-        // Start klokke
         setInterval(tick, 1000); tick();
         initPaint();
+        initWeather(); // Start vær
         
         if(store.codeOn) document.getElementById('lock-screen').style.display = 'flex';
     }
@@ -306,6 +308,49 @@
         }
     }
 
+    // --- EKTE VÆR (Open-Meteo) ---
+    function initWeather() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(fetchWeather, weatherErr);
+        } else {
+            weatherErr();
+        }
+    }
+
+    async function fetchWeather(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const data = await res.json();
+            const t = data.current_weather.temperature;
+            const c = data.current_weather.weathercode;
+            
+            document.getElementById('w-temp').innerText = t + "°C";
+            document.getElementById('w-city').innerText = "Din Posisjon"; // Open-Meteo gir ikke bynavn, bare data
+            
+            let icon = "☀️"; let desc = "Klarvær";
+            if(c > 1) { icon = "⛅"; desc = "Skyet"; }
+            if(c > 40) { icon = "🌫️"; desc = "Tåke"; }
+            if(c > 50) { icon = "🌧️"; desc = "Regn"; }
+            if(c > 70) { icon = "❄️"; desc = "Snø"; }
+            if(c > 90) { icon = "⛈️"; desc = "Torden"; }
+            
+            document.getElementById('w-icon').innerText = icon;
+            document.getElementById('w-desc').innerText = desc;
+        } catch(e) {
+            weatherErr();
+        }
+    }
+
+    function weatherErr() {
+        // Fallback til Oslo hvis GPS nektes
+        document.getElementById('w-city').innerText = "Oslo (Demo)";
+        document.getElementById('w-temp').innerText = "15°C";
+        document.getElementById('w-icon').innerText = "⛅";
+        document.getElementById('w-desc').innerText = "Standard vær";
+    }
+
     // --- SETTINGS ---
     function togDark() { 
         store.dark = !store.dark; 
@@ -328,7 +373,7 @@
         saveState();
     }
 
-    // --- MUSIKK (Ikke persistent pga størrelse) ---
+    // --- MUSIKK ---
     let songs = []; let cur = 0; let spd = [1, 1.5, 2]; let spdI = 0;
     const player = document.getElementById('audio');
     function impMusic(e) { const f=e.target.files[0]; if(f){ songs.push({name:f.name, url:URL.createObjectURL(f)}); renderMusic(); } }
@@ -341,7 +386,7 @@
     function skip(d) { let n=cur+d; if(n>=0 && n<songs.length) playS(n); }
     function changeSpeed() { spdI=(spdI+1)%3; player.playbackRate=spd[spdI]; document.getElementById('spd-btn').innerText=spd[spdI]+"x"; }
 
-    // --- TEGNE & GALLERI ---
+    // --- TEGNE & GALLERI & EKTE DELING ---
     let pc=document.getElementById('paint-canvas'), pctx=pc.getContext('2d'), pColor='black', pDraw=false;
     function initPaint() { 
         pc.width = pc.clientWidth; pc.height = pc.clientHeight; 
@@ -361,13 +406,34 @@
             <div class="gal-item">
                 <img src="${img}" class="gal-img">
                 <div class="gal-actions">
-                    <button class="gal-btn" onclick="delPic(${i})">🗑️ Slett</button>
-                    <button class="gal-btn" onclick="sharePic()">📤 Del</button>
+                    <button class="gal-btn" onclick="delPic(${i})">🗑️</button>
+                    <button class="gal-btn" onclick="sharePic(${i})">📤</button>
                 </div>
             </div>`).join('');
     }
     function delPic(i) { store.pics.splice(i,1); saveState(); renderGal(); }
-    function sharePic() { alert("Delt med venner! (Simulert)"); }
+
+    // DENNE FUNKSJONEN ÅPNER EGEN MENY
+    async function sharePic(i) {
+        try {
+            const dataUrl = store.pics[i];
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], "bilde.png", { type: blob.type });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'SuperMobil Bilde',
+                    text: 'Sjekk hva jeg laget på SuperMobilen!',
+                    files: [file]
+                });
+            } else {
+                alert("Nettleseren din støtter ikke deling av filer direkte :(");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Kunne ikke dele bildet. (Krever HTTPS eller Localhost)");
+        }
+    }
 
     // --- NOTATER ---
     function renderNotes() {
