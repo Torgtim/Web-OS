@@ -3,75 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperMobil v9 - Classic Fix</title>
+    <title>SuperMobil v10 - Komplett Arkiv</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; }
+        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-grey: #8E8E93; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
-        body { 
-            background: #1a1a1a; font-family: -apple-system, sans-serif; 
-            height: 100vh; display: flex; justify-content: center; align-items: center; 
-            overflow: hidden;
-        }
+        body { background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        /* DEN KLASSISKE RAMMEN */
-        .phone-frame {
-            width: 380px; height: 750px;
-            background: #000; border-radius: 50px; border: 12px solid #333;
-            position: relative; display: flex; flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        .phone-frame { width: 380px; height: 780px; background: #000; border-radius: 50px; border: 12px solid #333; position: relative; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .screen { flex-grow: 1; position: relative; overflow: hidden; background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover; border-radius: 30px; margin: 5px; }
 
-        .screen {
-            flex-grow: 1; position: relative; overflow: hidden;
-            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover;
-            border-radius: 30px; margin: 5px;
-        }
-
-        /* LÅSESKJERM */
-        #lock-screen {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
-        }
-
-        /* HJEMSKJERM GRID */
+        /* HJEMSKJERM */
         .home-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 25px; }
-        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
-        .app-label { color: white; font-size: 11px; font-weight: 500; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
+        .icon-box { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .app-label { color: white; font-size: 10px; font-weight: 500; text-align: center; }
 
         /* APP VINDUER */
-        .app-window { position: absolute; inset: 0; background: white; transform: translateY(110%); transition: 0.4s ease-out; z-index: 500; display: flex; flex-direction: column; }
+        .app-window { position: absolute; inset: 0; background: white; transform: translateY(110%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 500; display: flex; flex-direction: column; }
         .app-window.active { transform: translateY(0); }
         .app-header { padding: 40px 20px 10px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
 
-        /* SNAKE DESIGN */
-        #snake-container { flex-grow: 1; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #snake-canvas { background: #111; border: 2px solid #333; }
-        .snake-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
-        .btn { background: #333; color: white; border: none; padding: 15px; border-radius: 10px; }
-
-        /* MUSIKK - MOBIL LISTE */
-        .music-player { padding: 20px; background: #eee; text-align: center; }
-        .song-row { padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; }
-
-        /* DEN FYSISKE HJEM-KNAPPEN */
-        .home-btn-area { height: 70px; display: flex; justify-content: center; align-items: center; }
-        .home-circle { width: 50px; height: 50px; border: 3px solid #444; border-radius: 50%; cursor: pointer; background: transparent; transition: 0.2s; }
-        .home-circle:active { background: #222; }
+        /* SPESIFIKKE DESIGN */
+        #snake-canvas { background: #000; display: block; margin: 0 auto; border: 2px solid #333; }
+        .note-item { padding: 15px; border-bottom: 1px solid #eee; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; background: #000; flex-grow: 1; }
+        .calc-btn { height: 60px; border-radius: 30px; border: none; font-size: 20px; color: white; background: #333; }
+        
+        /* HJEM-KNAPP */
+        .home-btn-area { height: 65px; display: flex; justify-content: center; align-items: center; }
+        .home-circle { width: 45px; height: 45px; border: 3px solid #444; border-radius: 50%; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="phone-frame">
-    <div id="lock-screen">
-        <h2 style="margin-bottom:20px;">12:00</h2>
-        <input type="password" id="pin" placeholder="Kode: 1234" style="padding:10px; border-radius:10px; text-align:center; border:none; width:120px;">
-        <button onclick="unlock()" style="margin-top:10px; padding:10px 20px; border-radius:20px; background:var(--ios-blue); color:white; border:none;">Lås opp</button>
-    </div>
-
     <div class="screen" id="main-screen">
-        <div style="height:30px; padding:10px 20px; color:white; display:flex; justify-content:space-between; font-size:12px;">
+        <div style="height:30px; padding:10px 20px; color:white; display:flex; justify-content:space-between; font-size:12px; position:relative; z-index:1000;">
             <span id="clock">12:00</span><span>📶 🔋</span>
         </div>
 
@@ -79,136 +46,95 @@
             <div class="app-icon" onclick="openApp('app-music')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
             <div class="app-icon" onclick="openApp('app-snake')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
             <div class="app-icon" onclick="openApp('app-web')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
+            <div class="app-icon" onclick="openApp('app-cam')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
+            <div class="app-icon" onclick="openApp('app-gal')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
+            <div class="app-icon" onclick="openApp('app-calc')"><div class="icon-box" style="background:#FF9500;">➗</div><span class="app-label">Kalkulator</span></div>
+            <div class="app-icon" onclick="openApp('app-notes')"><div class="icon-box" style="background:#FEE34C;">📝</div><span class="app-label">Notater</span></div>
+            <div class="app-icon" onclick="openApp('app-file')"><div class="icon-box" style="background:#A2845E;">📁</div><span class="app-label">Filer</span></div>
+            <div class="app-icon" onclick="openApp('app-weather')"><div class="icon-box" style="background:#5AC8FA;">☀️</div><span class="app-label">Vær</span></div>
+            <div class="app-icon" onclick="openApp('app-chat')"><div class="icon-box" style="background:#34C759;">💬</div><span class="app-label">Chat</span></div>
+            <div class="app-icon" onclick="openApp('app-set')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Settings</span></div>
+        </div>
+
+        <div id="app-notes" class="app-window">
+            <div class="app-header">Notater <span onclick="addNote()" style="color:var(--ios-blue)">+ Ny</span></div>
+            <div id="notes-list" style="overflow-y:auto; flex-grow:1;"></div>
+            <div id="note-editor" style="display:none; position:absolute; inset:0; background:white; padding-top:50px;">
+                <button onclick="saveNote()" style="margin:10px;">Lagre</button>
+                <textarea id="note-text" style="width:100%; height:80%; padding:20px; border:none; outline:none; font-size:18px;"></textarea>
+            </div>
         </div>
 
         <div id="app-music" class="app-window">
             <div class="app-header">Musikk <label>➕<input type="file" hidden accept="audio/*" onchange="addMusic(event)"></label></div>
-            <div class="music-player">
-                <h3 id="m-title">Ingen sang</h3>
-                <audio id="audio" controls style="width:100%; margin-top:10px;"></audio>
-                <div style="margin-top:10px; display:flex; justify-content:space-around;">
-                    <button class="btn" onclick="skip(-1)">⏮</button>
-                    <button class="btn" onclick="skip(1)">⏭</button>
+            <div style="padding:20px; text-align:center; background:#eee;">
+                <h4 id="m-title">Velg en sang</h4>
+                <div style="margin:15px 0;">
+                    <button onclick="skip(-1)">⏮</button> <button onclick="togglePlay()" id="play-btn">▶️</button> <button onclick="skip(1)">⏭</button>
                 </div>
             </div>
             <div id="song-list" style="overflow-y:auto; flex-grow:1;"></div>
         </div>
 
-        <div id="app-snake" class="app-window">
-            <div class="app-header">Snake <span id="score">Poeng: 0</span></div>
-            <div id="snake-container">
-                <canvas id="snake-canvas" width="280" height="280"></canvas>
-                <div class="snake-controls">
-                    <button class="btn" style="grid-column:2" onclick="dir='UP'">▲</button>
-                    <button class="btn" onclick="dir='LEFT'">◀</button>
-                    <button class="btn" onclick="dir='DOWN'">▼</button>
-                    <button class="btn" onclick="dir='RIGHT'">▶</button>
-                </div>
-                <button id="restart-btn" onclick="startSnake()" style="display:none; padding:10px; background:var(--ios-red); color:white; border:none; border-radius:10px;">DØD! Prøv igjen?</button>
-            </div>
-        </div>
-
-        <div id="app-web" class="app-window">
-            <div class="app-header">Safari</div>
-            <input type="text" id="url-in" placeholder="Søk på Bing..." style="padding:10px; margin:5px; border-radius:10px; border:1px solid #ddd;">
-            <iframe id="web-frame" src="https://www.bing.com" style="flex-grow:1; border:none;"></iframe>
-        </div>
+        <div id="app-snake" class="app-window"><div class="app-header">Snake <span id="score">0</span></div><canvas id="snake-canvas" width="280" height="280"></canvas><button onclick="startSnake()" id="die-btn" style="display:none; color:red; padding:20px;">DØD! Prøv igjen?</button></div>
+        <div id="app-web" class="app-window"><div class="app-header">Safari</div><input type="text" id="url" placeholder="Søk..." style="padding:10px; margin:5px;"><iframe id="web" style="flex-grow:1; border:none;" src="https://www.bing.com"></iframe></div>
+        <div id="app-calc" class="app-window"><div class="app-header">Kalkulator</div><div id="c-res" style="background:#000; color:white; text-align:right; padding:30px; font-size:40px;">0</div><div class="calc-grid"><button class="calc-btn" onclick="cIn('7')">7</button><button class="calc-btn" onclick="cIn('8')">8</button><button class="calc-btn" onclick="cIn('9')">9</button><button class="calc-btn" style="background:#ff9500" onclick="cRes()">=</button></div></div>
+        <div id="app-cam" class="app-window" style="background:#000;"><video id="v" autoplay playsinline style="width:100%; height:70%; object-fit:cover;"></video><button onclick="takePic()" style="width:60px; height:60px; border-radius:50%; border:4px solid white; background:none; margin: 20px auto; display:block;"></button></div>
+        <div id="app-gal" class="app-window"><div class="app-header">Galleri</div><div id="gal-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px;"></div></div>
+        <div id="app-file" class="app-window"><div class="app-header">Filer</div><div id="file-content" style="padding:20px;"></div></div>
+        <div id="app-weather" class="app-window" style="background:linear-gradient(#4facfe, #00f2fe);"><div class="app-header" style="background:transparent;">Vær</div><div style="text-align:center; padding-top:40px; color:white;"><h1>Oslo</h1><h2>18°☀️</h2></div></div>
+        <div id="app-chat" class="app-window"><div class="app-header">Chat</div><div id="chat-out" style="flex-grow:1; padding:10px;"></div><input id="chat-in" style="padding:10px;"></div>
+        <div id="app-set" class="app-window"><div class="app-header">Settings</div><button onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')" style="padding:20px;">Bytt Bakgrunn</button></div>
 
     </div>
-
-    <div class="home-btn-area">
-        <div class="home-circle" onclick="goHome()"></div>
-    </div>
+    <div class="home-btn-area"><div class="home-circle" onclick="goHome()"></div></div>
 </div>
 
+<audio id="audio"></audio>
+
 <script>
-    // --- KLOKKE OG LÅS ---
-    function updateClock() {
-        const d = new Date();
-        document.getElementById('clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2,'0');
-    }
-    setInterval(updateClock, 1000); updateClock();
-
-    function unlock() {
-        if(document.getElementById('pin').value === "1234") {
-            document.getElementById('lock-screen').style.display = "none";
-        }
-    }
-
-    // --- NAVIGASJON ---
-    function openApp(id) { 
-        document.getElementById(id).classList.add('active');
-        if(id === 'app-snake') startSnake();
-    }
-    function goHome() { 
-        document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active'));
-        clearInterval(gameInterval);
-    }
-
-    // --- MUSIKK ---
-    let songs = []; let cur = 0;
+    let songs = [], cur = 0, notes = JSON.parse(localStorage.getItem('notes') || '[]');
     const player = document.getElementById('audio');
 
-    function addMusic(e) {
-        const file = e.target.files[0];
-        if(file) {
-            songs.push({ name: file.name, url: URL.createObjectURL(file) });
-            renderSongs();
-        }
-    }
-    function renderSongs() {
-        document.getElementById('song-list').innerHTML = songs.map((s,i) => `
-            <div class="song-row">
-                <span onclick="playSong(${i})">🎵 ${s.name}</span>
-                <button onclick="songs.splice(${i},1);renderSongs()" style="border:none; color:red;">X</button>
-            </div>`).join('');
-    }
-    function playSong(i) {
-        cur = i; player.src = songs[i].url; player.play();
-        document.getElementById('m-title').innerText = songs[i].name;
-    }
+    function openApp(id) { document.getElementById(id).classList.add('active'); if(id==='app-snake') startSnake(); if(id==='app-notes') renderNotes(); if(id==='app-cam') startCam(); if(id==='app-gal') renderGal(); if(id==='app-file') renderFiles(); }
+    function goHome() { document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); clearInterval(gameInt); if(stream) stream.getTracks().forEach(t=>t.stop()); }
+    function updateClock() { const d = new Date(); document.getElementById('clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2,'0'); }
+    setInterval(updateClock, 1000); updateClock();
+
+    // --- NOTATER ---
+    function renderNotes() { document.getElementById('notes-list').innerHTML = notes.map((n,i) => `<div class="note-item" onclick="editNote(${i})">${n.substring(0,30)}...</div>`).join(''); }
+    function addNote() { document.getElementById('note-editor').style.display = 'block'; document.getElementById('note-text').value = ''; }
+    function saveNote() { const txt = document.getElementById('note-text').value; if(txt) { notes.push(txt); localStorage.setItem('notes', JSON.stringify(notes)); } document.getElementById('note-editor').style.display = 'none'; renderNotes(); }
+
+    // --- MUSIKK ---
+    function addMusic(e) { const f = e.target.files[0]; if(f) { songs.push({name:f.name, url:URL.createObjectURL(f)}); renderSongs(); } }
+    function renderSongs() { document.getElementById('song-list').innerHTML = songs.map((s,i) => `<div style="padding:15px; border-bottom:1px solid #eee;" onclick="playSong(${i})">🎵 ${s.name}</div>`).join(''); }
+    function playSong(i) { cur = i; player.src = songs[i].url; player.play(); document.getElementById('m-title').innerText = songs[i].name; document.getElementById('play-btn').innerText = "⏸"; }
+    function togglePlay() { if(player.paused) { player.play(); document.getElementById('play-btn').innerText = "⏸"; } else { player.pause(); document.getElementById('play-btn').innerText = "▶️"; } }
     function skip(d) { let n = cur + d; if(n >= 0 && n < songs.length) playSong(n); }
 
-    // --- SNAKE SYSTEM ---
-    let canvas = document.getElementById('snake-canvas');
-    let ctx = canvas.getContext('2d');
-    let snake, food, dir, gameInterval, score;
-
-    function startSnake() {
-        document.getElementById('restart-btn').style.display = "none";
-        snake = [{x:10, y:10}]; dir = "RIGHT"; score = 0;
-        food = {x: Math.floor(Math.random()*13+1), y: Math.floor(Math.random()*13+1)};
-        if(gameInterval) clearInterval(gameInterval);
-        gameInterval = setInterval(drawSnake, 150);
+    // --- SNAKE ---
+    let canvas = document.getElementById('snake-canvas'), ctx = canvas.getContext('2d'), snake, food, dir, gameInt, score;
+    function startSnake() { document.getElementById('die-btn').style.display='none'; snake = [{x:10,y:10}]; dir='RIGHT'; score=0; food={x:5,y:5}; gameInt = setInterval(drawS, 150); }
+    function drawS() {
+        ctx.fillStyle='black'; ctx.fillRect(0,0,280,280); ctx.fillStyle='red'; ctx.fillRect(food.x*20, food.y*20, 18, 18); ctx.fillStyle='lime'; snake.forEach(p=>ctx.fillRect(p.x*20,p.y*20,18,18));
+        let h = {...snake[0]}; if(dir==='UP') h.y--; if(dir==='DOWN') h.y++; if(dir==='LEFT') h.x--; if(dir==='RIGHT') h.x++;
+        if(h.x<0||h.x>13||h.y<0||h.y>13||snake.some(p=>p.x===h.x&&p.y===h.y)) { clearInterval(gameInt); document.getElementById('die-btn').style.display='block'; return; }
+        if(h.x===food.x && h.y===food.y) { score++; document.getElementById('score').innerText=score; food={x:Math.floor(Math.random()*14),y:Math.floor(Math.random()*14)}; } else { snake.pop(); } snake.unshift(h);
     }
+    window.addEventListener('keydown', e => { if(e.key==='ArrowUp') dir='UP'; if(e.key==='ArrowDown') dir='DOWN'; if(e.key==='ArrowLeft') dir='LEFT'; if(e.key==='ArrowRight') dir='RIGHT'; });
 
-    function drawSnake() {
-        ctx.fillStyle = "black"; ctx.fillRect(0,0,280,280);
-        ctx.fillStyle = "red"; ctx.fillRect(food.x*20, food.y*20, 18, 18);
-        ctx.fillStyle = "lime";
-        snake.forEach(p => ctx.fillRect(p.x*20, p.y*20, 18, 18));
+    // --- KAMERA/GALLERI/FILER ---
+    let stream;
+    async function startCam() { stream = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('v').srcObject = stream; }
+    function takePic() { const c=document.createElement('canvas'); c.width=640; c.height=480; c.getContext('2d').drawImage(document.getElementById('v'),0,0); let p=JSON.parse(localStorage.getItem('pics')||'[]'); p.push(c.toDataURL()); localStorage.setItem('pics', JSON.stringify(p)); alert("Lagret!"); }
+    function renderGal() { let p=JSON.parse(localStorage.getItem('pics')||'[]'); document.getElementById('gal-grid').innerHTML = p.map(i=>`<img src="${i}" style="width:100%; aspect-ratio:1; object-fit:cover;">`).join(''); }
+    function renderFiles() { document.getElementById('file-content').innerHTML = `Sanger: ${songs.length}<br>Bilder: ${JSON.parse(localStorage.getItem('pics')||'[]').length}<br>Notater: ${notes.length}`; }
 
-        let h = {...snake[0]};
-        if(dir==="UP") h.y--; if(dir==="DOWN") h.y++; if(dir==="LEFT") h.x--; if(dir==="RIGHT") h.x++;
-
-        // Sjekk om du dør
-        if(h.x<0 || h.x>13 || h.y<0 || h.y>13 || snake.some(p=>p.x===h.x && p.y===h.y)) {
-            clearInterval(gameInterval);
-            document.getElementById('restart-btn').style.display = "block";
-            return;
-        }
-
-        if(h.x === food.x && h.y === food.y) {
-            score++; document.getElementById('score').innerText = "Poeng: " + score;
-            food = {x: Math.floor(Math.random()*13+1), y: Math.floor(Math.random()*13+1)};
-        } else { snake.pop(); }
-        snake.unshift(h);
-    }
-
-    // --- SAFARI ---
-    document.getElementById('url-in').onkeypress = (e) => {
-        if(e.key === 'Enter') document.getElementById('web-frame').src = "https://www.bing.com/search?q=" + e.target.value;
-    }
+    // --- KALKULATOR ---
+    let cD = document.getElementById('c-res');
+    function cIn(v) { if(cD.innerText==='0') cD.innerText=v; else cD.innerText+=v; }
+    function cRes() { try { cD.innerText = eval(cD.innerText); } catch { cD.innerText="Feil"; } }
 </script>
 </body>
 </html>
