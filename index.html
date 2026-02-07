@@ -3,59 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="screen-orientation" content="portrait">
-    <title>SuperMobil v6 - Pro</title>
+    <title>SuperMobil v7 - Alt-i-ett</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; }
+        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-grey: #8E8E93; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        /* TVUNGET PORTRETT-VISNING */
-        body { 
-            margin: 0; background: #1a1a1a; font-family: -apple-system, sans-serif; 
-            height: 100vh; display: flex; justify-content: center; align-items: center; 
-            overflow: hidden; touch-action: manipulation;
-        }
+        body { margin: 0; background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        .phone-frame {
-            width: 100%; height: 100%; max-width: 414px; max-height: 850px;
-            background: #000; border-radius: 50px; border: 12px solid #333;
-            position: relative; display: flex; flex-direction: column;
-        }
+        /* RAMME */
+        .phone-frame { width: 100%; height: 100%; max-width: 414px; max-height: 850px; background: #000; border-radius: 50px; border: 12px solid #333; position: relative; display: flex; flex-direction: column; }
+        .screen { flex-grow: 1; position: relative; overflow: hidden; background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover; border-radius: 35px; margin: 5px; }
 
-        .screen {
-            flex-grow: 1; position: relative; overflow: hidden;
-            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover;
-            border-radius: 35px; margin: 5px;
-        }
-
-        /* APP STIL */
-        .app-window {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; transform: translateY(100%); transition: 0.4s ease-out;
-            z-index: 500; display: flex; flex-direction: column;
-        }
+        /* APPER GENERELT */
+        .app-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 500; display: flex; flex-direction: column; }
         .app-window.active { transform: translateY(0); }
-        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; }
+        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
 
         /* HJEMSKJERM */
         .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 30px 20px; }
         .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+        .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
+        .app-label { color: white; font-size: 10px; text-shadow: 1px 1px 2px black; }
 
-        /* CHAT BOKSER */
-        .msg { padding: 10px 15px; border-radius: 18px; max-width: 75%; margin-bottom: 5px; font-size: 14px; }
-        .msg.sent { align-self: flex-end; background: var(--ios-blue); color: white; }
-        .msg.received { align-self: flex-start; background: #e5e5ea; color: black; }
+        /* MUSIKK LISTE */
+        .song-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* KALKULATOR */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
+        .calc-btn { height: 60px; border-radius: 30px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* MUSIKK */
-        .music-ui { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        #import-btn { background: #eee; padding: 10px; border-radius: 10px; cursor: pointer; margin-top: 20px; font-size: 12px; }
-
+        /* SNAKE */
+        #snake-canvas { background: #000; display: block; margin: 0 auto; }
+        
         .home-btn { height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .home-circle { width: 45px; height: 45px; border: 2px solid #444; border-radius: 50%; }
     </style>
 </head>
-<body>
+<body onload="initPhone()">
 
 <div class="phone-frame">
     <div class="screen" id="main-screen">
@@ -64,102 +47,172 @@
         </div>
 
         <div class="home-screen">
-            <div class="app-icon" onclick="openApp('msg-app')"><div class="icon-box" style="background:#34C759;">💬</div><span style="color:white;font-size:10px;">Chat</span></div>
-            <div class="app-icon" onclick="openApp('music-app')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span style="color:white;font-size:10px;">Musikk</span></div>
-            <div class="app-icon" onclick="openApp('browser-app')"><div class="icon-box" style="background:#007AFF;">🌐</div><span style="color:white;font-size:10px;">Safari</span></div>
-        </div>
-
-        <div id="msg-app" class="app-window">
-            <div class="app-header">Chat med AI-Venn</div>
-            <div id="chat-box" style="flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column;">
-                <div class="msg received">Hei! Hva skjer? 😊</div>
-            </div>
-            <div style="padding:15px; border-top:1px solid #ddd; display:flex; gap:10px;">
-                <input type="text" id="msg-in" placeholder="Melding..." style="flex-grow:1; border-radius:20px; border:1px solid #ccc; padding:10px;">
-                <button onclick="sendMsg()" style="color:var(--ios-blue); border:none; background:none; font-weight:bold;">Send</button>
-            </div>
+            <div class="app-icon" onclick="openApp('msg-app')"><div class="icon-box" style="background:#34C759;">💬</div><span class="app-label">Chat</span></div>
+            <div class="app-icon" onclick="openApp('cam-app')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
+            <div class="app-icon" onclick="openApp('gal-app')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
+            <div class="app-icon" onclick="openApp('music-app')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
+            <div class="app-icon" onclick="openApp('snake-app')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
+            <div class="app-icon" onclick="openApp('browser-app')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
+            <div class="app-icon" onclick="openApp('calc-app')"><div class="icon-box" style="background:#FF9500;">➗</div><span class="app-label">Kalkulator</span></div>
+            <div class="app-icon" onclick="openApp('weather-app')"><div class="icon-box" style="background:#5AC8FA;">☀️</div><span class="app-label">Vær</span></div>
+            <div class="app-icon" onclick="openApp('file-app')"><div class="icon-box" style="background:#A2845E;">📁</div><span class="app-label">Filer</span></div>
+            <div class="app-icon" onclick="openApp('settings-app')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Innstillinger</span></div>
         </div>
 
         <div id="music-app" class="app-window">
-            <div class="app-header">Musikk</div>
-            <div class="music-ui">
-                <div style="width:200px; height:200px; background:#f0f0f0; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:50px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">💿</div>
-                <h3 id="track-name" style="margin-top:20px;">Ingen sang valgt</h3>
-                <audio id="player" controls style="width:80%; margin-top:20px;"></audio>
-                
-                <label id="import-btn">
-                    📥 Importer MP3 fra fil
-                    <input type="file" id="file-input" accept="audio/mp3" style="display:none;" onchange="loadMP3(event)">
-                </label>
+            <div class="app-header">Musikk <label style="color:var(--ios-blue); cursor:pointer;">+ Legg til<input type="file" hidden accept="audio/*" onchange="addSong(event)"></label></div>
+            <div id="now-playing" style="padding:20px; text-align:center; background:#f0f0f0;">
+                <div style="font-size:40px;">🎵</div>
+                <b id="current-title">Ingen sang</b>
+                <div style="margin-top:10px;">
+                    <button onclick="prevSong()">⏮</button>
+                    <button id="pBtn" onclick="togglePlay()">▶️</button>
+                    <button onclick="nextSong()">⏭</button>
+                </div>
+            </div>
+            <div id="playlist" style="flex-grow:1; overflow-y:auto;"></div>
+        </div>
+
+        <div id="file-app" class="app-window">
+            <div class="app-header">Filutforsker</div>
+            <div id="file-list" style="padding:10px;"></div>
+        </div>
+
+        <div id="weather-app" class="app-window" style="background:linear-gradient(#4facfe, #00f2fe); color:white;">
+            <div class="app-header" style="background:transparent; border:none;">Vær</div>
+            <div style="text-align:center; padding-top:50px;">
+                <h1>Oslo</h1>
+                <div style="font-size:80px;">☀️</div>
+                <div style="font-size:40px;">18°C</div>
+                <p>Strålende sol</p>
             </div>
         </div>
 
-        <div id="browser-app" class="app-window">
-            <div class="app-header">Safari</div>
-            <input type="text" id="url" placeholder="Søk på nettet..." style="margin:10px; padding:10px; border-radius:10px; border:1px solid #ddd;">
-            <iframe id="web-view" src="about:blank" style="flex-grow:1; border:none;"></iframe>
+        <div id="calc-app" class="app-window" style="background:#000;">
+            <div class="app-header">Kalkulator</div>
+            <div id="calc-display" style="color:white; text-align:right; padding:40px 20px; font-size:40px;">0</div>
+            <div class="calc-grid">
+                <button class="calc-btn" style="background:#a5a5a5;" onclick="calcClear()">C</button>
+                <button class="calc-btn" style="background:#ff9500; color:white;" onclick="calcIn('/')">÷</button>
+                <button class="calc-btn" style="background:#333; color:white;" onclick="calcIn('7')">7</button>
+                <button class="calc-btn" style="background:#ff9500; color:white;" onclick="calcRes()">=</button>
+                </div>
         </div>
+
+        <div id="snake-app" class="app-window"><div class="app-header">Snake</div><canvas id="snake-canvas" width="300" height="300"></canvas><button onclick="resetSnake()" style="margin:20px;">Start Spill</button></div>
+        <div id="cam-app" class="app-window" style="background:black;"><video id="vid" autoplay playsinline style="width:100%;height:80%;object-fit:cover;"></video><button onclick="takePic()" style="width:70px;height:70px;border-radius:50%;border:5px solid white;background:none;margin:0 auto;"></button></div>
+        <div id="gal-app" class="app-window"><div class="app-header">Galleri</div><div id="gal-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;"></div></div>
+        <div id="msg-app" class="app-window"><div class="app-header">Chat</div><div id="chat-box" style="flex-grow:1;padding:10px;overflow-y:auto;"></div><input id="msg-in" onkeypress="if(e.key=='Enter')sendMsg()" style="padding:10px;"></div>
+        <div id="browser-app" class="app-window"><div class="app-header">Safari</div><iframe id="web-view" style="flex-grow:1;border:none;"></iframe></div>
+        <div id="settings-app" class="app-window"><div class="app-header">Innstillinger</div><button onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')">Fjell bakgrunn</button></div>
 
     </div>
     <div class="home-btn" onclick="goHome()"><div class="home-circle"></div></div>
 </div>
 
+<audio id="global-player"></audio>
+
 <script>
-    // --- KLOKKE ---
+    let songs = [];
+    let currentSongIndex = 0;
+    const player = document.getElementById('global-player');
+
+    function initPhone() {
+        updateTime(); setInterval(updateTime, 1000);
+        const savedWall = localStorage.getItem('wallpaper');
+        if(savedWall) document.getElementById('main-screen').style.backgroundImage = `url('${savedWall}')`;
+        updateFileList();
+    }
+
     function updateTime() {
         const now = new Date();
         document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
     }
-    setInterval(updateTime, 1000); updateTime();
 
-    // --- NAVIGASJON ---
-    function openApp(id) { document.getElementById(id).classList.add('active'); }
-    function goHome() { document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); }
-
-    // --- CHAT LOGIKK ---
-    function sendMsg() {
-        let input = document.getElementById('msg-in');
-        let box = document.getElementById('chat-box');
-        if(!input.value) return;
-
-        // Din melding
-        box.innerHTML += `<div class="msg sent">${input.value}</div>`;
-        let userText = input.value.toLowerCase();
-        input.value = "";
-
-        // Automatisk svar (Bot)
-        setTimeout(() => {
-            let reply = "Det høres kult ut! 🚀";
-            if(userText.includes("hei")) reply = "Heisann! Hvordan går det?";
-            if(userText.includes("snake")) reply = "Elsker Snake! Har du fått highscore?";
-            box.innerHTML += `<div class="msg received">${reply}</div>`;
-            box.scrollTop = box.scrollHeight;
-        }, 1000);
-        
-        box.scrollTop = box.scrollHeight;
+    function openApp(id) { 
+        document.getElementById(id).classList.add('active'); 
+        if(id === 'cam-app') startCam();
+        if(id === 'gal-app') loadGal();
+        if(id === 'file-app') updateFileList();
+    }
+    
+    function goHome() { 
+        document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); 
+        if(stream) stream.getTracks().forEach(t => t.stop());
     }
 
-    // --- MUSIKK IMPORTERING ---
-    function loadMP3(event) {
-        const file = event.target.files[0];
-        if (file) {
+    // --- MUSIKK SYSTEM ---
+    function addSong(e) {
+        const file = e.target.files[0];
+        if(file) {
             const url = URL.createObjectURL(file);
-            const player = document.getElementById('player');
-            document.getElementById('track-name').innerText = file.name;
-            player.src = url;
-            player.play();
+            songs.push({ name: file.name, url: url });
+            renderPlaylist();
+            updateFileList();
         }
     }
 
-    // --- BROWSER ---
-    document.getElementById('url').addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') {
-            let val = document.getElementById('url').value;
-            let link = val.startsWith('http') ? val : 'https://www.bing.com/search?q=' + val;
-            document.getElementById('web-view').src = link;
-        }
-    });
-</script>
+    function renderPlaylist() {
+        const list = document.getElementById('playlist');
+        list.innerHTML = songs.map((s, i) => `
+            <div class="song-item">
+                <span onclick="playSong(${i})" style="cursor:pointer;">${s.name}</span>
+                <button onclick="removeSong(${i})" style="color:red; border:none; background:none;">🗑️</button>
+            </div>
+        `).join('');
+    }
 
+    function playSong(i) {
+        currentSongIndex = i;
+        player.src = songs[i].url;
+        player.play();
+        document.getElementById('current-title').innerText = songs[i].name;
+        document.getElementById('pBtn').innerText = "⏸";
+    }
+
+    function togglePlay() {
+        if(player.paused) { player.play(); document.getElementById('pBtn').innerText = "⏸"; }
+        else { player.pause(); document.getElementById('pBtn').innerText = "▶️"; }
+    }
+
+    function nextSong() { if(currentSongIndex < songs.length - 1) playSong(currentSongIndex + 1); }
+    function prevSong() { if(currentSongIndex > 0) playSong(currentSongIndex - 1); }
+    function removeSong(i) { songs.splice(i, 1); renderPlaylist(); updateFileList(); }
+
+    // --- FILER ---
+    function updateFileList() {
+        const list = document.getElementById('file-list');
+        let html = "<h4>Mine Sanger</h4>";
+        songs.forEach(s => html += `<div>🎵 ${s.name}</div>`);
+        let pics = JSON.parse(localStorage.getItem('pics') || '[]');
+        html += "<h4>Mine Bilder</h4>";
+        pics.forEach((p, i) => html += `<div>🖼️ Bilde_${i}.jpg</div>`);
+        list.innerHTML = html;
+    }
+
+    // --- KALKULATOR ENKEL ---
+    let cDisp = document.getElementById('calc-display');
+    function calcIn(v) { if(cDisp.innerText == '0') cDisp.innerText = v; else cDisp.innerText += v; }
+    function calcClear() { cDisp.innerText = '0'; }
+    function calcRes() { try { cDisp.innerText = eval(cDisp.innerText); } catch { cDisp.innerText = "Feil"; } }
+
+    // (Gamle funksjoner for kamera/galleri/snake må være med her for å virke)
+    let stream;
+    async function startCam() { stream = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('vid').srcObject = stream; }
+    function takePic() {
+        const v = document.getElementById('vid');
+        const c = document.createElement('canvas');
+        c.width=v.videoWidth; c.height=v.videoHeight;
+        c.getContext('2d').drawImage(v,0,0);
+        let p = JSON.parse(localStorage.getItem('pics') || '[]');
+        p.unshift(c.toDataURL());
+        localStorage.setItem('pics', JSON.stringify(p));
+        alert("Bilde lagret!");
+    }
+    function loadGal() {
+        let p = JSON.parse(localStorage.getItem('pics') || '[]');
+        document.getElementById('gal-list').innerHTML = p.map(img => `<img src="${img}" style="width:100%; aspect-ratio:1; object-fit:cover;">`).join('');
+    }
+</script>
 </body>
 </html>
