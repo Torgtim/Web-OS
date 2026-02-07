@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperMobil v4 - Cloud & Share</title>
+    <title>SuperMobil v5 - Ultimate</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; }
+        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-grey: #8E8E93; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        body { margin: 0; background: #1a1a1a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
         /* TELEFON-RAMME */
         .phone-frame {
@@ -19,7 +19,7 @@
         .screen {
             flex-grow: 1; position: relative; overflow: hidden;
             background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover;
-            border-radius: 35px; margin: 5px;
+            border-radius: 35px; margin: 5px; transition: background 0.5s ease;
         }
 
         /* HJEM-KNAPP */
@@ -33,95 +33,115 @@
             z-index: 500; display: flex; flex-direction: column;
         }
         .app-window.active { transform: translateY(0); }
-        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
+        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
 
-        /* GALLERI & DELING */
-        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 5px; overflow-y: auto; }
-        .photo-card { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
-        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-actions { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: space-around; padding: 2px 0; }
-        .action-btn { color: white; border: none; background: none; font-size: 14px; cursor: pointer; }
-
-        /* SNAKE OVERLAY */
-        #snake-ui { position: relative; flex-grow: 1; background: #000; display: flex; flex-direction: column; }
-        #game-over-screen { 
-            position: absolute; top:0; left:0; width:100%; height:100%; 
-            background: rgba(0,0,0,0.8); color: white; 
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
-        }
-
-        /* UI ELEMENTER */
-        .status-bar { height: 35px; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; color: white; font-size: 12px; z-index: 1000; }
+        /* HJEMSKJERM */
+        .status-bar { height: 35px; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; color: white; font-size: 12px; z-index: 1000; font-weight: 600; }
         .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 30px 20px; }
-        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
         .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .app-label { color: white; font-size: 11px; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+
+        /* MUSIKK APP */
+        .music-player { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .album-art { width: 200px; height: 200px; background: #eee; border-radius: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 80px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .music-btns { display: flex; gap: 30px; align-items: center; }
+        .m-btn { font-size: 30px; border: none; background: none; cursor: pointer; }
+
+        /* NETTLESER */
+        .browser-bar { padding: 10px; display: flex; gap: 5px; background: #eee; }
+        .browser-bar input { flex-grow: 1; border-radius: 10px; border: 1px solid #ccc; padding: 8px; font-size: 14px; }
+        .browser-content { flex-grow: 1; border: none; background: #fff; }
+
+        /* INNSTILLINGER */
+        .settings-list { padding: 20px; }
+        .wallpaper-option { width: 100%; height: 60px; border-radius: 10px; margin-bottom: 10px; border: 2px solid transparent; cursor: pointer; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: bold; background-size: cover; background-position: center; }
+
+        /* SNAKE & GALLERI (fra v4) */
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 5px; overflow-y: auto; }
+        .photo-card { position: relative; aspect-ratio: 1; overflow: hidden; }
+        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
+        #snake-ui { flex-grow: 1; background: #000; position: relative; }
+        #game-over-screen { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:10; }
     </style>
 </head>
-<body>
+<body onload="initPhone()">
 
 <div class="phone-frame">
-    <div class="screen">
+    <div class="screen" id="main-screen">
         <div class="status-bar"><div id="clock">12:00</div><div>📶 🔋</div></div>
 
         <div class="home-screen">
-            <div class="app-icon" onclick="openApp('msg-app')"><div class="icon-box" style="background:#34C759;">💬</div><span style="color:white;font-size:11px;">Chat</span></div>
-            <div class="app-icon" onclick="openApp('cam-app')"><div class="icon-box" style="background:#8E8E93;">📷</div><span style="color:white;font-size:11px;">Kamera</span></div>
-            <div class="app-icon" onclick="openApp('gal-app')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span style="color:white;font-size:11px;">Galleri</span></div>
-            <div class="app-icon" onclick="openApp('snake-app')"><div class="icon-box" style="background:#000; border:1px solid #333;">🐍</div><span style="color:white;font-size:11px;">Snake</span></div>
+            <div class="app-icon" onclick="openApp('msg-app')"><div class="icon-box" style="background:#34C759;">💬</div><span class="app-label">Chat</span></div>
+            <div class="app-icon" onclick="openApp('cam-app')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
+            <div class="app-icon" onclick="openApp('gal-app')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
+            <div class="app-icon" onclick="openApp('snake-app')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
+            <div class="app-icon" onclick="openApp('music-app')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
+            <div class="app-icon" onclick="openApp('browser-app')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
+            <div class="app-icon" onclick="openApp('settings-app')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Innstillinger</span></div>
         </div>
 
-        <div id="msg-app" class="app-window">
-            <div class="app-header"><span>Cloud Chat</span><span style="color:var(--ios-blue); font-size:12px;">Online</span></div>
-            <div id="chat-box" style="flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
-            <div style="padding:10px; border-top:1px solid #ddd; display:flex;">
-                <input type="text" id="msg-in" placeholder="Skriv melding..." style="flex-grow:1; border-radius:20px; border:1px solid #ddd; padding:10px;">
-                <button onclick="sendMsg()" style="border:none; background:none; color:var(--ios-blue); font-weight:bold; margin-left:10px;">Send</button>
-            </div>
-        </div>
-
-        <div id="cam-app" class="app-window" style="background:black;">
-            <video id="vid" autoplay playsinline style="width:100%; height:80%; object-fit:cover;"></video>
-            <div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
-                <button onclick="takePic()" style="width:70px; height:70px; border:5px solid white; border-radius:50%; background:none;"></button>
-            </div>
-        </div>
-
-        <div id="gal-app" class="app-window">
-            <div class="app-header">Mitt Galleri <span onclick="localStorage.removeItem('pics'); loadGal();" style="color:red; font-size:12px;">Tøm</span></div>
-            <div id="gal-list" class="gallery-grid"></div>
-        </div>
-
-        <div id="snake-app" class="app-window">
-            <div class="app-header">Snake <span id="score">0</span></div>
-            <div id="snake-ui">
-                <div id="game-over-screen">
-                    <h2 style="margin:0;">GAME OVER</h2>
-                    <p id="final-score">Poeng: 0</p>
-                    <button onclick="resetSnake()" style="padding:10px 20px; border-radius:20px; border:none; background:var(--ios-green); color:white; font-weight:bold;">Prøv igjen</button>
+        <div id="music-app" class="app-window">
+            <div class="app-header">Nå spilles</div>
+            <div class="music-player">
+                <div class="album-art" id="art">🎵</div>
+                <h2 id="song-title">Velg en sang</h2>
+                <p style="color:gray;">Artist Navn</p>
+                <div class="music-btns">
+                    <button class="m-btn">⏮</button>
+                    <button class="m-btn" id="playBtn" onclick="toggleMusic()">▶️</button>
+                    <button class="m-btn">⏭</button>
                 </div>
-                <canvas id="snake-canvas" width="320" height="320" style="background:#111; width:100%;"></canvas>
-                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding:20px; justify-items:center; background:#222;">
-                    <div></div><button onclick="d='UP'" style="width:50px;height:50px;border-radius:10px;">▲</button><div></div>
-                    <button onclick="d='LEFT'" style="width:50px;height:50px;border-radius:10px;">◀</button>
-                    <button onclick="d='DOWN'" style="width:50px;height:50px;border-radius:10px;">▼</button>
-                    <button onclick="d='RIGHT'" style="width:50px;height:50px;border-radius:10px;">▶</button>
-                </div>
+                <audio id="audio-player" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
             </div>
         </div>
 
-    </div> <div class="physical-home-btn">
+        <div id="browser-app" class="app-window">
+            <div class="app-header">Søk på nettet</div>
+            <div class="browser-bar">
+                <input type="text" id="url-input" placeholder="google.com eller søkeord...">
+                <button onclick="goBrowse()" style="background:var(--ios-blue); color:white; border:none; border-radius:8px; padding:0 10px;">Gå</button>
+            </div>
+            <iframe id="browser-frame" class="browser-content" src="about:blank"></iframe>
+        </div>
+
+        <div id="settings-app" class="app-window">
+            <div class="app-header">Innstillinger</div>
+            <div class="settings-list">
+                <h3>Bakgrunnsbilde</h3>
+                <div class="wallpaper-option" style="background-image:url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=300');" onclick="setWall('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500')">Mørk Abstrakt</div>
+                <div class="wallpaper-option" style="background-image:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300');" onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')">Fjell</div>
+                <div class="wallpaper-option" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300');" onclick="setWall('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500')">Strand</div>
+                <div class="wallpaper-option" style="background-image:url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=300');" onclick="setWall('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500')">Skog</div>
+            </div>
+        </div>
+
+        <div id="msg-app" class="app-window"><div class="app-header">Chat</div><div id="chat-box" style="flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div><div style="padding:10px; border-top:1px solid #ddd; display:flex;"><input type="text" id="msg-in" style="flex-grow:1; border-radius:20px; border:1px solid #ddd; padding:10px;"><button onclick="sendMsg()" style="border:none; background:none; color:var(--ios-blue); font-weight:bold; margin-left:10px;">Send</button></div></div>
+        <div id="cam-app" class="app-window" style="background:black;"><video id="vid" autoplay playsinline style="width:100%; height:80%; object-fit:cover;"></video><div style="flex-grow:1; display:flex; justify-content:center; align-items:center;"><button onclick="takePic()" style="width:70px; height:70px; border:5px solid white; border-radius:50%; background:none;"></button></div></div>
+        <div id="gal-app" class="app-window"><div class="app-header">Galleri</div><div id="gal-list" class="gallery-grid"></div></div>
+        <div id="snake-app" class="app-window"><div class="app-header">Snake <span id="score">0</span></div><div id="snake-ui"><div id="game-over-screen"><h2>GAME OVER</h2><button onclick="resetSnake()" style="padding:10px 20px; border-radius:20px; border:none; background:var(--ios-green); color:white;">Prøv igjen</button></div><canvas id="snake-canvas" width="320" height="320" style="background:#111; width:100%;"></canvas><div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:20px; background:#222;"><button onclick="d='UP'" style="grid-column:2; height:50px;">▲</button><button onclick="d='LEFT'" style="grid-column:1; height:50px;">◀</button><button onclick="d='DOWN'" style="grid-column:2; height:50px;">▼</button><button onclick="d='RIGHT'" style="grid-column:3; height:50px;">▶</button></div></div></div>
+
+    </div>
+
+    <div class="physical-home-btn">
         <div class="home-circle" onclick="goHome()"></div>
     </div>
 </div>
 
 <script>
-    // --- SYSTEM ---
+    // --- INITIALISERING ---
+    function initPhone() {
+        updateTime(); setInterval(updateTime, 1000);
+        const savedWall = localStorage.getItem('wallpaper');
+        if(savedWall) document.getElementById('main-screen').style.backgroundImage = `url('${savedWall}')`;
+    }
+
     function updateTime() {
         const now = new Date();
         document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
     }
-    setInterval(updateTime, 1000); updateTime();
 
+    // --- NAVIGASJON ---
     function openApp(id) {
         document.getElementById(id).classList.add('active');
         if(id === 'cam-app') startCam();
@@ -131,9 +151,37 @@
     function goHome() {
         document.querySelectorAll('.app-window').forEach(w => w.classList.remove('active'));
         stopCam(); stopSnake();
+        document.getElementById('audio-player').pause();
     }
 
-    // --- SNAKE (FIKSET RESTART) ---
+    // --- INNSTILLINGER (BAKGRUNN) ---
+    function setWall(url) {
+        document.getElementById('main-screen').style.backgroundImage = `url('${url}')`;
+        localStorage.setItem('wallpaper', url);
+    }
+
+    // --- MUSIKK ---
+    let isPlaying = false;
+    function toggleMusic() {
+        let player = document.getElementById('audio-player');
+        let btn = document.getElementById('playBtn');
+        if(isPlaying) { player.pause(); btn.innerText = "▶️"; } 
+        else { player.play(); btn.innerText = "⏸"; document.getElementById('song-title').innerText = "Demo Sang #1"; }
+        isPlaying = !isPlaying;
+    }
+
+    // --- NETTLESER ---
+    function goBrowse() {
+        let input = document.getElementById('url-input').value;
+        let frame = document.getElementById('browser-frame');
+        if(!input.startsWith('http')) {
+            frame.src = "https://www.bing.com/search?q=" + input; // Google blokkerer ofte iframes, Bing funker bedre
+        } else {
+            frame.src = input;
+        }
+    }
+
+    // --- SNAKE (forbedret fra v4) ---
     let canvas = document.getElementById("snake-canvas");
     let ctx = canvas.getContext("2d");
     let box = 20, snake, food, d, gameLoop;
@@ -143,87 +191,42 @@
         document.getElementById('game-over-screen').style.display = 'none';
         snake = [{x: 8 * box, y: 8 * box}];
         food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
-        d = "RIGHT";
-        document.getElementById('score').innerText = "0";
+        d = "RIGHT"; document.getElementById('score').innerText = "0";
         gameLoop = setInterval(drawSnake, 150);
     }
-
     function stopSnake() { clearInterval(gameLoop); }
-
     function drawSnake() {
         ctx.fillStyle = "#111"; ctx.fillRect(0,0,320,320);
-        for(let i=0; i<snake.length; i++) {
-            ctx.fillStyle = (i==0) ? "#34C759" : "#28a745";
-            ctx.fillRect(snake[i].x, snake[i].y, box-2, box-2);
-        }
-        ctx.fillStyle = "#FF3B30"; ctx.fillRect(food.x, food.y, box-2, box-2);
-
-        let hX = snake[0].x; let hY = snake[0].y;
-        if(d=="LEFT") hX -= box; if(d=="UP") hY -= box;
-        if(d=="RIGHT") hX += box; if(d=="DOWN") hY += box;
-
-        if(hX == food.x && hY == food.y) {
-            food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box};
-            document.getElementById('score').innerText = snake.length;
-        } else { snake.pop(); }
-
-        let newH = {x: hX, y: hY};
-        if(hX<0 || hX>=320 || hY<0 || hY>=320 || snake.some(s => s.x==hX && s.y==hY)) {
-            stopSnake();
-            document.getElementById('final-score').innerText = "Poeng: " + (snake.length - 1);
-            document.getElementById('game-over-screen').style.display = 'flex';
-            return;
-        }
-        snake.unshift(newH);
+        snake.forEach((s, i) => { ctx.fillStyle = (i==0)?"#34C759":"#28a745"; ctx.fillRect(s.x, s.y, box-2, box-2); });
+        ctx.fillStyle = "red"; ctx.fillRect(food.x, food.y, box-2, box-2);
+        let hX = snake[0].x, hY = snake[0].y;
+        if(d=="LEFT") hX-=box; if(d=="UP") hY-=box; if(d=="RIGHT") hX+=box; if(d=="DOWN") hY+=box;
+        if(hX==food.x && hY==food.y) { food = {x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box}; document.getElementById('score').innerText = snake.length; } 
+        else { snake.pop(); }
+        if(hX<0 || hX>=320 || hY<0 || hY>=320 || snake.some(s=>s.x==hX && s.y==hY)) { stopSnake(); document.getElementById('game-over-screen').style.display = 'flex'; return; }
+        snake.unshift({x:hX, y:hY});
     }
 
-    // --- KAMERA & DELING ---
+    // --- KAMERA & GALLERI (fra v4) ---
     let stream;
-    async function startCam() { 
-        try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}}); document.getElementById('vid').srcObject = stream; } 
-        catch(e) { alert("Ingen tilgang til kamera"); }
-    }
+    async function startCam() { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}}); document.getElementById('vid').srcObject = stream; }
     function stopCam() { if(stream) stream.getTracks().forEach(t => t.stop()); }
-    
     function takePic() {
         let v = document.getElementById('vid'), c = document.createElement('canvas');
-        c.width=v.videoWidth; c.height=v.videoHeight;
-        c.getContext('2d').drawImage(v,0,0);
-        let pics = JSON.parse(localStorage.getItem('pics')) || [];
-        pics.unshift(c.toDataURL('image/jpeg', 0.7));
-        localStorage.setItem('pics', JSON.stringify(pics));
-        alert("Lagret i galleri!");
+        c.width=v.videoWidth; c.height=v.videoHeight; c.getContext('2d').drawImage(v,0,0);
+        let p = JSON.parse(localStorage.getItem('pics')||'[]'); p.unshift(c.toDataURL()); localStorage.setItem('pics', JSON.stringify(p)); alert("Lagret!");
     }
-
     function loadGal() {
-        let pics = JSON.parse(localStorage.getItem('pics')) || [];
-        document.getElementById('gal-list').innerHTML = pics.map((p, i) => `
-            <div class="photo-card">
-                <img src="${p}">
-                <div class="photo-actions">
-                    <button class="action-btn" onclick="sharePic(${i})">📤</button>
-                    <button class="action-btn" onclick="delPic(${i})" style="color:red;">🗑️</button>
-                </div>
-            </div>
-        `).join('');
+        let p = JSON.parse(localStorage.getItem('pics')||'[]');
+        document.getElementById('gal-list').innerHTML = p.map((img, i) => `<div class="photo-card"><img src="${img}"><button onclick="sharePic(${i})" style="position:absolute; bottom:0; width:100%;">📤</button></div>`).join('');
+    }
+    async function sharePic(i) {
+        const p = JSON.parse(localStorage.getItem('pics'));
+        const f = new File([await (await fetch(p[i])).blob()], 'bilde.jpg', {type:'image/jpeg'});
+        if(navigator.share) navigator.share({files:[f]});
     }
 
-    async function sharePic(index) {
-        const pics = JSON.parse(localStorage.getItem('pics'));
-        const blob = await (await fetch(pics[index])).blob();
-        const file = new File([blob], 'min-blink.jpg', { type: 'image/jpeg' });
-        
-        if (navigator.share) {
-            navigator.share({ files: [file], title: 'Sjekk dette bildet!', text: 'Tatt med min egen web-mobil.' })
-            .catch(err => console.log("Deling avbrutt"));
-        } else {
-            alert("Deling støttes ikke i denne nettleseren, men bildet er lagret!");
-        }
-    }
-    
-    function delPic(i) { let p = JSON.parse(localStorage.getItem('pics')); p.splice(i,1); localStorage.setItem('pics', JSON.stringify(p)); loadGal(); }
-
-    // --- CHAT LOGIKK ---
+    // --- CHAT ---
     function sendMsg() {
         let i = document.getElementById('msg-in'), b = document.getElementById('chat-box');
         if(!i.value) return;
@@ -231,23 +234,5 @@
         i.value = ""; b.scrollTop = b.scrollHeight;
     }
 </script>
-
-<script type="module">
-  // For å få ekte chat, må du fylle ut din egen konfigurasjon fra Firebase Console:
-  /*
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "DIN_API_KEY",
-    databaseURL: "DIN_DATABASE_URL",
-    projectId: "DITT_PROSJEKT_ID",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  */
-</script>
-
 </body>
 </html>
