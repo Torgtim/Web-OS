@@ -3,216 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperMobil v7 - Alt-i-ett</title>
+    <title>SuperMobil v8</title>
     <style>
-        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-grey: #8E8E93; }
+        :root { --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        body { margin: 0; background: #1a1a1a; font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; }
 
-        /* RAMME */
-        .phone-frame { width: 100%; height: 100%; max-width: 414px; max-height: 850px; background: #000; border-radius: 50px; border: 12px solid #333; position: relative; display: flex; flex-direction: column; }
-        .screen { flex-grow: 1; position: relative; overflow: hidden; background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover; border-radius: 35px; margin: 5px; }
+        /* DYNAMISK RAMME */
+        .phone-frame { 
+            width: 95vw; height: 95vh; max-width: 400px; max-height: 800px; 
+            background: #000; border-radius: 40px; border: 8px solid #333; 
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
 
-        /* APPER GENERELT */
-        .app-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 500; display: flex; flex-direction: column; }
+        .screen { 
+            flex-grow: 1; position: relative; 
+            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500') center/cover;
+            transition: 0.5s; 
+        }
+
+        /* LÅSESKJERM */
+        #lock-screen {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+            backdrop-filter: blur(10px); transition: 0.5s;
+        }
+
+        /* APPER */
+        .app-window { position: absolute; inset: 0; background: white; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 500; display: flex; flex-direction: column; }
         .app-window.active { transform: translateY(0); }
-        .app-header { padding: 45px 20px 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
+        .app-header { padding: 40px 20px 10px; background: #f9f9f9; border-bottom: 1px solid #ddd; font-weight: bold; display: flex; justify-content: space-between; }
 
-        /* HJEMSKJERM */
-        .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 30px 20px; }
-        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
-        .app-label { color: white; font-size: 10px; text-shadow: 1px 1px 2px black; }
+        /* MUSIKK MOBIL-DESIGN */
+        .music-card { padding: 20px; text-align: center; }
+        .song-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        .song-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; align-items: center; }
 
-        /* MUSIKK LISTE */
-        .song-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        /* HJEMSKJERM GRID */
+        .home-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px; }
+        .icon { display: flex; flex-direction: column; align-items: center; font-size: 30px; }
+        .icon div { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .home-bar { height: 50px; background: #000; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .home-circle { width: 40px; height: 40px; border: 2px solid #555; border-radius: 50%; }
         
-        /* KALKULATOR */
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
-        .calc-btn { height: 60px; border-radius: 30px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; }
-
-        /* SNAKE */
-        #snake-canvas { background: #000; display: block; margin: 0 auto; }
-        
-        .home-btn { height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .home-circle { width: 45px; height: 45px; border: 2px solid #444; border-radius: 50%; }
+        canvas { background: #000; width: 100%; touch-action: none; }
     </style>
 </head>
-<body onload="initPhone()">
+<body onload="init()">
 
 <div class="phone-frame">
-    <div class="screen" id="main-screen">
-        <div style="height:30px; padding:10px 25px; color:white; display:flex; justify-content:space-between; font-size:12px;">
-            <span id="clock">12:00</span><span>📶 🔋</span>
+    <div id="lock-screen">
+        <h2>Tast kode</h2>
+        <input type="password" id="pin" maxlength="4" style="font-size:30px; width:100px; text-align:center; border-radius:10px; border:none; margin-bottom:20px;">
+        <button onclick="checkPin()" style="padding:10px 20px; border-radius:20px; border:none; background:var(--ios-blue); color:white;">Lås opp</button>
+        <p id="lock-msg" style="color:red;"></p>
+    </div>
+
+    <div class="screen" id="main">
+        <div style="height:35px; padding:10px 20px; color:white; display:flex; justify-content:space-between; font-size:12px; z-index:100;">
+            <span id="time">12:00</span><span>📶 🔋</span>
         </div>
 
-        <div class="home-screen">
-            <div class="app-icon" onclick="openApp('msg-app')"><div class="icon-box" style="background:#34C759;">💬</div><span class="app-label">Chat</span></div>
-            <div class="app-icon" onclick="openApp('cam-app')"><div class="icon-box" style="background:#8E8E93;">📷</div><span class="app-label">Kamera</span></div>
-            <div class="app-icon" onclick="openApp('gal-app')"><div class="icon-box" style="background:linear-gradient(#ffdd00, #ff9500);">🖼️</div><span class="app-label">Galleri</span></div>
-            <div class="app-icon" onclick="openApp('music-app')"><div class="icon-box" style="background:#FF2D55;">🎵</div><span class="app-label">Musikk</span></div>
-            <div class="app-icon" onclick="openApp('snake-app')"><div class="icon-box" style="background:#000;">🐍</div><span class="app-label">Snake</span></div>
-            <div class="app-icon" onclick="openApp('browser-app')"><div class="icon-box" style="background:#007AFF;">🌐</div><span class="app-label">Safari</span></div>
-            <div class="app-icon" onclick="openApp('calc-app')"><div class="icon-box" style="background:#FF9500;">➗</div><span class="app-label">Kalkulator</span></div>
-            <div class="app-icon" onclick="openApp('weather-app')"><div class="icon-box" style="background:#5AC8FA;">☀️</div><span class="app-label">Vær</span></div>
-            <div class="app-icon" onclick="openApp('file-app')"><div class="icon-box" style="background:#A2845E;">📁</div><span class="app-label">Filer</span></div>
-            <div class="app-icon" onclick="openApp('settings-app')"><div class="icon-box" style="background:#5856D6;">⚙️</div><span class="app-label">Innstillinger</span></div>
+        <div class="home-grid">
+            <div class="icon" onclick="openApp('app-music')"><div style="background:#FF2D55;">🎵</div><span style="color:white;font-size:10px;">Musikk</span></div>
+            <div class="icon" onclick="openApp('app-snake')"><div style="background:#000;">🐍</div><span style="color:white;font-size:10px;">Snake</span></div>
+            <div class="icon" onclick="openApp('app-web')"><div style="background:#007AFF;">🌐</div><span style="color:white;font-size:10px;">Safari</span></div>
+            <div class="icon" onclick="openApp('app-set')"><div style="background:#8E8E93;">⚙️</div><span style="color:white;font-size:10px;">Settings</span></div>
         </div>
 
-        <div id="music-app" class="app-window">
-            <div class="app-header">Musikk <label style="color:var(--ios-blue); cursor:pointer;">+ Legg til<input type="file" hidden accept="audio/*" onchange="addSong(event)"></label></div>
-            <div id="now-playing" style="padding:20px; text-align:center; background:#f0f0f0;">
-                <div style="font-size:40px;">🎵</div>
-                <b id="current-title">Ingen sang</b>
-                <div style="margin-top:10px;">
-                    <button onclick="prevSong()">⏮</button>
-                    <button id="pBtn" onclick="togglePlay()">▶️</button>
-                    <button onclick="nextSong()">⏭</button>
+        <div id="app-music" class="app-window">
+            <div class="app-header">Musikk <label>➕<input type="file" hidden accept="audio/*" onchange="handleMusic(event)"></label></div>
+            <div class="music-card">
+                <div id="m-art" style="width:120px;height:120px;background:#eee;margin:0 auto;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:50px;">🎶</div>
+                <h4 id="m-title">Ingen sang</h4>
+                <div style="font-size:25px; display:flex; justify-content:center; gap:30px;">
+                    <span onclick="skip(-1)">⏮</span> <span id="play-btn" onclick="playPause()">▶️</span> <span onclick="skip(1)">⏭</span>
                 </div>
             </div>
-            <div id="playlist" style="flex-grow:1; overflow-y:auto;"></div>
+            <div id="song-list" class="song-list"></div>
         </div>
 
-        <div id="file-app" class="app-window">
-            <div class="app-header">Filutforsker</div>
-            <div id="file-list" style="padding:10px;"></div>
+        <div id="app-web" class="app-window">
+            <div class="app-header">Safari <span onclick="document.getElementById('frame').src='https://www.bing.com'">🏠</span></div>
+            <input type="text" id="url" placeholder="Søk på Bing..." style="padding:10px; border:none; background:#eee; margin:5px; border-radius:10px;">
+            <iframe id="frame" src="https://www.bing.com" style="flex-grow:1; border:none;"></iframe>
         </div>
 
-        <div id="weather-app" class="app-window" style="background:linear-gradient(#4facfe, #00f2fe); color:white;">
-            <div class="app-header" style="background:transparent; border:none;">Vær</div>
-            <div style="text-align:center; padding-top:50px;">
-                <h1>Oslo</h1>
-                <div style="font-size:80px;">☀️</div>
-                <div style="font-size:40px;">18°C</div>
-                <p>Strålende sol</p>
+        <div id="app-snake" class="app-window">
+            <div class="app-header">Snake - Poeng: <span id="score">0</span></div>
+            <canvas id="snake-canvas" width="300" height="300"></canvas>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:20px;">
+                <button onclick="changeDir('UP')" style="grid-column:2;">▲</button>
+                <button onclick="changeDir('LEFT')">◀</button> <button onclick="changeDir('DOWN')">▼</button> <button onclick="changeDir('RIGHT')">▶</button>
+            </div>
+            <button onclick="startSnake()" style="margin:10px;">Start nytt spill</button>
+        </div>
+
+        <div id="app-set" class="app-window">
+            <div class="app-header">Innstillinger</div>
+            <div style="padding:20px;">
+                <h4>Velg Bakgrunn</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div onclick="setWall('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500')" style="height:80px; background:url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=200') center; border-radius:10px;"></div>
+                    <div onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')" style="height:80px; background:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200') center; border-radius:10px;"></div>
+                </div>
             </div>
         </div>
-
-        <div id="calc-app" class="app-window" style="background:#000;">
-            <div class="app-header">Kalkulator</div>
-            <div id="calc-display" style="color:white; text-align:right; padding:40px 20px; font-size:40px;">0</div>
-            <div class="calc-grid">
-                <button class="calc-btn" style="background:#a5a5a5;" onclick="calcClear()">C</button>
-                <button class="calc-btn" style="background:#ff9500; color:white;" onclick="calcIn('/')">÷</button>
-                <button class="calc-btn" style="background:#333; color:white;" onclick="calcIn('7')">7</button>
-                <button class="calc-btn" style="background:#ff9500; color:white;" onclick="calcRes()">=</button>
-                </div>
-        </div>
-
-        <div id="snake-app" class="app-window"><div class="app-header">Snake</div><canvas id="snake-canvas" width="300" height="300"></canvas><button onclick="resetSnake()" style="margin:20px;">Start Spill</button></div>
-        <div id="cam-app" class="app-window" style="background:black;"><video id="vid" autoplay playsinline style="width:100%;height:80%;object-fit:cover;"></video><button onclick="takePic()" style="width:70px;height:70px;border-radius:50%;border:5px solid white;background:none;margin:0 auto;"></button></div>
-        <div id="gal-app" class="app-window"><div class="app-header">Galleri</div><div id="gal-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;"></div></div>
-        <div id="msg-app" class="app-window"><div class="app-header">Chat</div><div id="chat-box" style="flex-grow:1;padding:10px;overflow-y:auto;"></div><input id="msg-in" onkeypress="if(e.key=='Enter')sendMsg()" style="padding:10px;"></div>
-        <div id="browser-app" class="app-window"><div class="app-header">Safari</div><iframe id="web-view" style="flex-grow:1;border:none;"></iframe></div>
-        <div id="settings-app" class="app-window"><div class="app-header">Innstillinger</div><button onclick="setWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500')">Fjell bakgrunn</button></div>
 
     </div>
-    <div class="home-btn" onclick="goHome()"><div class="home-circle"></div></div>
+    <div class="home-bar" onclick="goHome()"><div class="home-circle"></div></div>
 </div>
 
-<audio id="global-player"></audio>
+<audio id="audio"></audio>
 
 <script>
-    let songs = [];
-    let currentSongIndex = 0;
-    const player = document.getElementById('global-player');
-
-    function initPhone() {
-        updateTime(); setInterval(updateTime, 1000);
-        const savedWall = localStorage.getItem('wallpaper');
-        if(savedWall) document.getElementById('main-screen').style.backgroundImage = `url('${savedWall}')`;
-        updateFileList();
-    }
-
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
-    }
-
-    function openApp(id) { 
-        document.getElementById(id).classList.add('active'); 
-        if(id === 'cam-app') startCam();
-        if(id === 'gal-app') loadGal();
-        if(id === 'file-app') updateFileList();
-    }
+    let songs = []; let curIdx = 0; const audio = document.getElementById('audio');
     
-    function goHome() { 
-        document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); 
-        if(stream) stream.getTracks().forEach(t => t.stop());
+    function init() {
+        setInterval(() => { const d = new Date(); document.getElementById('time').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2,'0'); }, 1000);
+        const w = localStorage.getItem('wall'); if(w) document.getElementById('main').style.backgroundImage = `url('${w}')`;
     }
 
-    // --- MUSIKK SYSTEM ---
-    function addSong(e) {
+    function checkPin() {
+        if(document.getElementById('pin').value === "1234") { document.getElementById('lock-screen').style.transform = "translateY(-100%)"; }
+        else { document.getElementById('lock-msg').innerText = "Feil kode!"; }
+    }
+
+    function openApp(id) { document.getElementById(id).classList.add('active'); if(id==='app-snake') startSnake(); }
+    function goHome() { document.querySelectorAll('.app-window').forEach(a => a.classList.remove('active')); stopSnake(); }
+
+    function setWall(u) { document.getElementById('main').style.backgroundImage = `url('${u}')`; localStorage.setItem('wall', u); }
+
+    // --- MUSIKK LOGIKK ---
+    function handleMusic(e) {
         const file = e.target.files[0];
         if(file) {
             const url = URL.createObjectURL(file);
             songs.push({ name: file.name, url: url });
-            renderPlaylist();
-            updateFileList();
+            renderSongs();
         }
     }
-
-    function renderPlaylist() {
-        const list = document.getElementById('playlist');
-        list.innerHTML = songs.map((s, i) => `
-            <div class="song-item">
-                <span onclick="playSong(${i})" style="cursor:pointer;">${s.name}</span>
-                <button onclick="removeSong(${i})" style="color:red; border:none; background:none;">🗑️</button>
-            </div>
-        `).join('');
+    function renderSongs() {
+        document.getElementById('song-list').innerHTML = songs.map((s,i) => `
+            <div class="song-row">
+                <span onclick="playSong(${i})">🎵 ${s.name.substring(0,20)}</span>
+                <button onclick="songs.splice(${i},1);renderSongs()" style="border:none;background:none;">❌</button>
+            </div>`).join('');
     }
-
     function playSong(i) {
-        currentSongIndex = i;
-        player.src = songs[i].url;
-        player.play();
-        document.getElementById('current-title').innerText = songs[i].name;
-        document.getElementById('pBtn').innerText = "⏸";
+        curIdx = i; audio.src = songs[i].url; audio.play();
+        document.getElementById('m-title').innerText = songs[i].name;
+        document.getElementById('play-btn').innerText = "⏸";
+    }
+    function playPause() { if(audio.paused) { audio.play(); document.getElementById('play-btn').innerText = "⏸"; } else { audio.pause(); document.getElementById('play-btn').innerText = "▶️"; } }
+    function skip(d) { let n = curIdx + d; if(n >= 0 && n < songs.length) playSong(n); }
+
+    // --- SNAKE LOGIKK ---
+    let canvas = document.getElementById('snake-canvas'); let ctx = canvas.getContext('2d');
+    let snake, food, dir, game;
+    function startSnake() {
+        clearInterval(game); snake = [{x:10, y:10}]; dir = 'RIGHT'; 
+        food = {x: Math.floor(Math.random()*14), y: Math.floor(Math.random()*14)};
+        game = setInterval(draw, 150);
+    }
+    function stopSnake() { clearInterval(game); }
+    function changeDir(d) { dir = d; }
+    function draw() {
+        ctx.fillStyle = "black"; ctx.fillRect(0,0,300,300);
+        ctx.fillStyle = "red"; ctx.fillRect(food.x*20, food.y*20, 18, 18);
+        ctx.fillStyle = "lime";
+        snake.forEach(p => ctx.fillRect(p.x*20, p.y*20, 18, 18));
+        let h = {...snake[0]};
+        if(dir==='UP') h.y--; if(dir==='DOWN') h.y++; if(dir==='LEFT') h.x--; if(dir==='RIGHT') h.x++;
+        if(h.x === food.x && h.y === food.y) { food = {x: Math.floor(Math.random()*14), y: Math.floor(Math.random()*14)}; document.getElementById('score').innerText = snake.length; } else { snake.pop(); }
+        if(h.x<0 || h.x>14 || h.y<0 || h.y>14 || snake.some(p=>p.x===h.x && p.y===h.y)) return startSnake();
+        snake.unshift(h);
     }
 
-    function togglePlay() {
-        if(player.paused) { player.play(); document.getElementById('pBtn').innerText = "⏸"; }
-        else { player.pause(); document.getElementById('pBtn').innerText = "▶️"; }
-    }
-
-    function nextSong() { if(currentSongIndex < songs.length - 1) playSong(currentSongIndex + 1); }
-    function prevSong() { if(currentSongIndex > 0) playSong(currentSongIndex - 1); }
-    function removeSong(i) { songs.splice(i, 1); renderPlaylist(); updateFileList(); }
-
-    // --- FILER ---
-    function updateFileList() {
-        const list = document.getElementById('file-list');
-        let html = "<h4>Mine Sanger</h4>";
-        songs.forEach(s => html += `<div>🎵 ${s.name}</div>`);
-        let pics = JSON.parse(localStorage.getItem('pics') || '[]');
-        html += "<h4>Mine Bilder</h4>";
-        pics.forEach((p, i) => html += `<div>🖼️ Bilde_${i}.jpg</div>`);
-        list.innerHTML = html;
-    }
-
-    // --- KALKULATOR ENKEL ---
-    let cDisp = document.getElementById('calc-display');
-    function calcIn(v) { if(cDisp.innerText == '0') cDisp.innerText = v; else cDisp.innerText += v; }
-    function calcClear() { cDisp.innerText = '0'; }
-    function calcRes() { try { cDisp.innerText = eval(cDisp.innerText); } catch { cDisp.innerText = "Feil"; } }
-
-    // (Gamle funksjoner for kamera/galleri/snake må være med her for å virke)
-    let stream;
-    async function startCam() { stream = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('vid').srcObject = stream; }
-    function takePic() {
-        const v = document.getElementById('vid');
-        const c = document.createElement('canvas');
-        c.width=v.videoWidth; c.height=v.videoHeight;
-        c.getContext('2d').drawImage(v,0,0);
-        let p = JSON.parse(localStorage.getItem('pics') || '[]');
-        p.unshift(c.toDataURL());
-        localStorage.setItem('pics', JSON.stringify(p));
-        alert("Bilde lagret!");
-    }
-    function loadGal() {
-        let p = JSON.parse(localStorage.getItem('pics') || '[]');
-        document.getElementById('gal-list').innerHTML = p.map(img => `<img src="${img}" style="width:100%; aspect-ratio:1; object-fit:cover;">`).join('');
-    }
+    // --- BROWSER ---
+    document.getElementById('url').onkeypress = (e) => { if(e.key==='Enter') document.getElementById('frame').src = 'https://www.bing.com/search?q=' + e.target.value; };
 </script>
 </body>
 </html>
